@@ -1,434 +1,368 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tambola / Housie — Play with Friends</title>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Tambola — Play with Friends</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g:#1D9E75;--gl:#E1F5EE;--gd:#0F6E56;
+  --r:#E24B4A;--rl:#FCEBEB;
+  --am:#EF9F27;--aml:#FAEEDA;
+  --bg:#F5F5F3;--bd:rgba(0,0,0,0.12);
+  --tx:#1a1a1a;--tm:#666;--cb:#fff;
+  --rad:12px;--rads:8px;
+}
+@media(prefers-color-scheme:dark){
+  :root{--bg:#1a1a1a;--bd:rgba(255,255,255,0.12);--tx:#f0f0f0;--tm:#999;--cb:#252525}
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+.app{max-width:640px;margin:0 auto;padding:.75rem}
+header{text-align:center;padding:1.2rem 0 .8rem}
+header h1{font-size:24px;font-weight:800;color:var(--g)}
+header p{font-size:13px;color:var(--tm);margin-top:3px}
+.card{background:var(--cb);border-radius:var(--rad);border:1px solid var(--bd);padding:1.1rem;margin-bottom:.85rem}
+.ct{font-size:15px;font-weight:600;margin-bottom:.85rem;color:var(--tx)}
+.hidden{display:none!important}
 
-    :root {
-      --green: #1D9E75;
-      --green-light: #E1F5EE;
-      --green-dark: #0F6E56;
-      --red: #E24B4A;
-      --red-light: #FCEBEB;
-      --amber: #EF9F27;
-      --amber-light: #FAEEDA;
-      --gray-bg: #F5F5F3;
-      --gray-border: rgba(0,0,0,0.12);
-      --text: #1a1a1a;
-      --text-muted: #666;
-      --card-bg: #fff;
-      --radius: 12px;
-      --radius-sm: 8px;
-    }
+/* inputs */
+input[type=text],input[type=number],select,textarea{
+  width:100%;padding:9px 13px;border:1px solid var(--bd);border-radius:var(--rads);
+  font-size:14px;background:var(--bg);color:var(--tx);margin-bottom:8px;outline:none;
+  transition:border-color .2s;font-family:inherit
+}
+input:focus,select:focus,textarea:focus{border-color:var(--g)}
+textarea{resize:vertical;min-height:60px}
+input.code-inp{text-transform:uppercase;letter-spacing:5px;font-size:18px;font-weight:700;text-align:center}
 
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --gray-bg: #1e1e1e;
-        --gray-border: rgba(255,255,255,0.12);
-        --text: #f0f0f0;
-        --text-muted: #999;
-        --card-bg: #2a2a2a;
-      }
-    }
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;
+  padding:9px 18px;border-radius:var(--rads);border:1px solid var(--bd);
+  background:var(--cb);color:var(--tx);font-size:14px;font-weight:500;cursor:pointer;transition:all .15s}
+.btn:hover{background:var(--bg)}
+.btn:active{transform:scale(.97)}
+.btn-p{background:var(--g);color:#fff;border-color:var(--g)}
+.btn-p:hover{background:var(--gd);border-color:var(--gd)}
+.btn-r{background:var(--r);color:#fff;border-color:var(--r)}
+.btn-r:hover{background:#b83a39}
+.btn-am{background:var(--am);color:#412402;border-color:var(--am)}
+.btn-block{width:100%;margin-bottom:7px}
+.btn-sm{padding:5px 12px;font-size:12px}
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: var(--gray-bg);
-      color: var(--text);
-      min-height: 100vh;
-    }
+/* chips */
+.chip{display:inline-flex;align-items:center;gap:4px;padding:4px 11px;border-radius:20px;font-size:12px;background:var(--bg);border:1px solid var(--bd)}
+.chip.host{background:var(--gl);border-color:var(--g);color:var(--gd);font-weight:600}
+.chip.me{font-weight:700}
+.chip.won{background:#FAC775;border-color:var(--am);color:#412402}
 
-    .app { max-width: 600px; margin: 0 auto; padding: 1rem; }
+/* room code */
+.rcode{font-size:34px;font-weight:800;letter-spacing:8px;color:var(--g);background:var(--gl);
+  border-radius:var(--rads);padding:12px;text-align:center;margin:6px 0}
+.share-box{background:var(--gl);border-radius:var(--rads);padding:10px 12px;text-align:center}
+.share-url{font-size:11px;color:var(--tm);word-break:break-all;margin-top:4px}
 
-    header {
-      text-align: center;
-      padding: 1.5rem 1rem 1rem;
-    }
-    header h1 { font-size: 26px; font-weight: 700; color: var(--green); }
-    header p { font-size: 14px; color: var(--text-muted); margin-top: 4px; }
+/* tabs */
+.tabs{display:flex;gap:3px;background:var(--bg);border-radius:var(--rads);padding:3px;margin-bottom:.85rem}
+.tab{flex:1;padding:7px 4px;border-radius:6px;border:none;background:transparent;color:var(--tm);font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap}
+.tab.active{background:var(--cb);color:var(--tx);box-shadow:0 1px 3px rgba(0,0,0,.1)}
 
-    .card {
-      background: var(--card-bg);
-      border-radius: var(--radius);
-      border: 1px solid var(--gray-border);
-      padding: 1.25rem;
-      margin-bottom: 1rem;
-    }
+/* ticket */
+.ticket-wrap{overflow-x:auto}
+.ticket{display:grid;grid-template-columns:repeat(9,1fr);gap:3px;min-width:270px}
+.tcell{
+  aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:600;border-radius:5px;
+  border:1px solid var(--bd);background:var(--bg);
+  transition:all .25s;user-select:none;cursor:pointer;position:relative
+}
+.tcell.blank{background:transparent;border-color:transparent;cursor:default}
+.tcell.hit{background:var(--g);color:#fff;border-color:var(--gd);transform:scale(1.06)}
+.tcell.manual{background:#FAC775;color:#412402;border-color:var(--am)}
+.tcell.manual.hit{background:var(--g);color:#fff}
+.tcell:not(.blank):not(.hit):hover{border-color:var(--g);background:var(--gl)}
 
-    .card-title {
-      font-size: 15px;
-      font-weight: 600;
-      margin-bottom: 1rem;
-      color: var(--text);
-    }
+/* manual number input for guests */
+.manual-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:3px;margin-top:8px}
+.mnum{
+  aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:600;border-radius:4px;border:1px solid var(--bd);
+  background:var(--bg);cursor:pointer;transition:all .2s;user-select:none
+}
+.mnum.called{background:var(--aml);color:#633806;border-color:var(--am)}
+.mnum.manual-marked{background:var(--am);color:#412402;border-color:#854F0B;font-weight:800}
+.mnum.manual-marked.called{background:var(--g);color:#fff;border-color:var(--gd)}
+.mnum.wrong{background:var(--rl);color:#7a1f1f;border-color:var(--r)}
 
-    input[type=text] {
-      width: 100%;
-      padding: 10px 14px;
-      border: 1px solid var(--gray-border);
-      border-radius: var(--radius-sm);
-      font-size: 15px;
-      background: var(--gray-bg);
-      color: var(--text);
-      margin-bottom: 10px;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-    input[type=text]:focus { border-color: var(--green); }
-    input.code-input {
-      text-transform: uppercase;
-      letter-spacing: 6px;
-      font-size: 20px;
-      font-weight: 600;
-      text-align: center;
-    }
+/* big number */
+.big-num{font-size:80px;font-weight:900;color:var(--r);text-align:center;line-height:1;padding:.8rem 0;
+  transition:all .3s;animation:popIn .35s ease}
+@keyframes popIn{0%{transform:scale(.5);opacity:0}80%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+.big-lbl{text-align:center;font-size:12px;color:var(--tm);margin-bottom:6px}
 
-    .btn {
-      display: inline-flex; align-items: center; justify-content: center;
-      padding: 10px 20px;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--gray-border);
-      background: var(--card-bg);
-      color: var(--text);
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.15s;
-      gap: 6px;
-    }
-    .btn:hover { background: var(--gray-bg); }
-    .btn:active { transform: scale(0.98); }
-    .btn-primary { background: var(--green); color: #fff; border-color: var(--green); }
-    .btn-primary:hover { background: var(--green-dark); border-color: var(--green-dark); }
-    .btn-block { width: 100%; margin-bottom: 8px; }
-    .btn-danger { background: var(--red); color: #fff; border-color: var(--red); }
-    .btn-sm { padding: 6px 14px; font-size: 13px; }
+/* balls */
+.balls-wrap{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;max-height:160px;overflow-y:auto}
+.ball{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;background:var(--bg);border:1px solid var(--bd);color:var(--tm);transition:all .3s}
+.ball.called{background:var(--aml);color:#633806;border-color:var(--am)}
+.ball.latest{background:var(--r);color:#fff;border-color:darkred;width:40px;height:40px;font-size:14px;box-shadow:0 0 0 4px rgba(226,75,74,.22)}
 
-    .hidden { display: none !important; }
+/* prizes */
+.prize-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.prize-card{background:var(--bg);border-radius:var(--rads);padding:9px 11px;border:1px solid var(--bd)}
+.prize-card.won{border-color:var(--g);background:var(--gl)}
+.pname{font-size:11px;color:var(--tm);margin-bottom:2px}
+.pwinner{font-size:13px;font-weight:700;color:var(--g)}
+.pwinner.empty{color:var(--tm);font-weight:400}
 
-    /* Room code display */
-    .room-code-display {
-      font-size: 36px;
-      font-weight: 700;
-      letter-spacing: 8px;
-      color: var(--green);
-      background: var(--green-light);
-      border-radius: var(--radius-sm);
-      padding: 14px;
-      text-align: center;
-      margin: 8px 0;
-    }
+/* leaderboard */
+.lb-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--bd)}
+.lb-row:last-child{border-bottom:none}
+.lb-medal{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.lb-name{font-size:14px;font-weight:600;flex:1}
+.lb-prize{font-size:12px;color:var(--tm)}
+.lb-badge{padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;background:var(--aml);color:#633806;border:1px solid var(--am)}
 
-    /* Players */
-    .players-list { display: flex; flex-wrap: wrap; gap: 8px; }
-    .player-chip {
-      padding: 5px 12px;
-      border-radius: 20px;
-      font-size: 13px;
-      background: var(--gray-bg);
-      border: 1px solid var(--gray-border);
-    }
-    .player-chip.host {
-      background: var(--green-light);
-      border-color: var(--green);
-      color: var(--green-dark);
-      font-weight: 600;
-    }
-    .player-chip.me { font-weight: 600; }
+/* chat */
+.chat-box{height:220px;overflow-y:auto;border:1px solid var(--bd);border-radius:var(--rads);padding:10px;margin-bottom:8px;background:var(--bg)}
+.chat-msg{margin-bottom:7px;font-size:13px;line-height:1.4}
+.chat-msg .who{font-weight:700;color:var(--g)}
+.chat-msg.me .who{color:#185FA5}
+.chat-msg.sys{color:var(--tm);font-style:italic;font-size:12px}
+.chat-row{display:flex;gap:6px}
+.chat-row input{margin:0;flex:1}
 
-    /* Tambola Ticket */
-    .ticket-wrap { overflow-x: auto; }
-    .ticket {
-      display: grid;
-      grid-template-columns: repeat(9, 1fr);
-      gap: 4px;
-      min-width: 280px;
-    }
-    .tcell {
-      aspect-ratio: 1;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px;
-      font-weight: 600;
-      border-radius: 6px;
-      border: 1px solid var(--gray-border);
-      background: var(--gray-bg);
-      transition: all 0.2s;
-      user-select: none;
-    }
-    .tcell.blank { background: transparent; border-color: transparent; }
-    .tcell.hit {
-      background: var(--green);
-      color: #fff;
-      border-color: var(--green-dark);
-      transform: scale(1.05);
-    }
+/* auto-call controls */
+.timer-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.timer-row label{font-size:13px;color:var(--tm);white-space:nowrap}
+.speed-btns{display:flex;gap:4px}
+.spd{padding:4px 10px;border-radius:6px;border:1px solid var(--bd);background:var(--cb);font-size:12px;cursor:pointer;transition:all .15s}
+.spd.active{background:var(--g);color:#fff;border-color:var(--g)}
+.progress-bar{height:4px;background:var(--bd);border-radius:2px;margin-bottom:10px;overflow:hidden}
+.progress-fill{height:100%;background:var(--r);border-radius:2px;transition:width linear}
 
-    /* Number ball */
-    .balls-wrap { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-    .ball {
-      width: 34px; height: 34px;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 12px; font-weight: 600;
-      background: var(--gray-bg);
-      border: 1px solid var(--gray-border);
-      color: var(--text-muted);
-      transition: all 0.3s;
-    }
-    .ball.called { background: var(--amber-light); color: #633806; border-color: var(--amber); }
-    .ball.latest {
-      background: var(--red);
-      color: #fff;
-      border-color: darkred;
-      width: 42px; height: 42px;
-      font-size: 15px;
-      box-shadow: 0 0 0 4px rgba(226,75,74,0.25);
-    }
+/* alert / banner */
+.alert{padding:9px 13px;border-radius:var(--rads);font-size:14px;margin-bottom:10px;font-weight:500}
+.alert-ok{background:var(--gl);color:var(--gd);border:1px solid var(--g)}
+.alert-err{background:var(--rl);color:#7a1f1f;border:1px solid var(--r)}
+.win-banner{
+  position:fixed;top:1rem;left:50%;transform:translateX(-50%);
+  background:var(--g);color:#fff;padding:11px 22px;border-radius:28px;
+  font-size:15px;font-weight:700;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,.22);
+  animation:slideDown .4s ease;white-space:nowrap
+}
+@keyframes slideDown{from{opacity:0;top:-2rem}to{opacity:1;top:1rem}}
 
-    /* Big current number */
-    .big-number {
-      font-size: 72px;
-      font-weight: 800;
-      color: var(--red);
-      text-align: center;
-      line-height: 1;
-      padding: 1rem 0;
-    }
-    .big-label { text-align: center; font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
+/* status pill */
+.spill{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;font-size:12px;background:var(--aml);color:#633806;margin-bottom:10px}
+.spill.live{background:var(--gl);color:var(--gd)}
+.dot{width:7px;height:7px;border-radius:50%;background:currentColor}
+.dot.pulse{animation:pulse 1.2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
-    /* Prizes */
-    .prizes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .prize-item {
-      background: var(--gray-bg);
-      border-radius: var(--radius-sm);
-      padding: 10px 12px;
-    }
-    .prize-name { font-size: 12px; color: var(--text-muted); }
-    .prize-winner { font-size: 14px; font-weight: 600; color: var(--green); margin-top: 2px; }
-    .prize-winner.empty { color: var(--text-muted); font-weight: 400; }
+/* multiple tickets nav */
+.ticket-tabs{display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap}
+.ttab{padding:4px 12px;border-radius:6px;border:1px solid var(--bd);background:var(--bg);font-size:12px;cursor:pointer;transition:all .15s;font-weight:500}
+.ttab.active{background:var(--g);color:#fff;border-color:var(--g)}
+.ttab.has-win{border-color:var(--am);background:var(--aml);color:#633806}
 
-    /* Tabs */
-    .tabs { display: flex; gap: 4px; background: var(--gray-bg); border-radius: var(--radius-sm); padding: 4px; margin-bottom: 1rem; }
-    .tab {
-      flex: 1; padding: 8px; border-radius: 6px; border: none;
-      background: transparent; color: var(--text-muted);
-      font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s;
-    }
-    .tab.active { background: var(--card-bg); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+/* grid 2col */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 
-    /* Alert */
-    .alert {
-      padding: 10px 14px;
-      border-radius: var(--radius-sm);
-      font-size: 14px;
-      margin-bottom: 12px;
-      font-weight: 500;
-    }
-    .alert-success { background: var(--green-light); color: var(--green-dark); border: 1px solid var(--green); }
-    .alert-error { background: var(--red-light); color: #7a1f1f; border: 1px solid var(--red); }
-
-    /* Status */
-    .status-pill {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 4px 12px; border-radius: 20px;
-      font-size: 13px; background: var(--amber-light); color: #633806;
-      margin-bottom: 12px;
-    }
-    .status-pill.live { background: var(--green-light); color: var(--green-dark); }
-    .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
-    .dot.pulse { animation: pulse 1.2s infinite; }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
-
-    /* Claim strip */
-    .claim-strip { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-
-    /* Divider */
-    .divider { border: none; border-top: 1px solid var(--gray-border); margin: 12px 0; }
-
-    /* Share section */
-    .share-box { background: var(--green-light); border-radius: var(--radius-sm); padding: 12px; text-align: center; }
-    .share-url { font-size: 12px; color: var(--text-muted); word-break: break-all; margin-top: 6px; }
-
-    /* Loading */
-    .spinner {
-      display: inline-block; width: 18px; height: 18px;
-      border: 2px solid var(--gray-border);
-      border-top-color: var(--green);
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* Win popup */
-    .win-banner {
-      position: fixed; top: 1rem; left: 50%; transform: translateX(-50%);
-      background: var(--green); color: #fff;
-      padding: 12px 24px; border-radius: 30px;
-      font-size: 15px; font-weight: 700;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-      z-index: 999;
-      animation: slideDown 0.4s ease;
-    }
-    @keyframes slideDown { from{opacity:0;top:-2rem} to{opacity:1;top:1rem} }
-
-    footer { text-align: center; font-size: 12px; color: var(--text-muted); padding: 2rem 0 1rem; }
-  </style>
+footer{text-align:center;font-size:11px;color:var(--tm);padding:1.5rem 0 .8rem}
+</style>
 </head>
 <body>
-
 <div class="app">
-  <header>
-    <h1>🎱 Tambola</h1>
-    <p>Play Housie with friends online — free &amp; instant</p>
-  </header>
+<header>
+  <h1>🎱 Tambola</h1>
+  <p>Live multiplayer Housie — play with friends anywhere</p>
+</header>
 
-  <div id="alert-box" class="hidden"></div>
+<div id="alertbox" class="hidden"></div>
 
-  <!-- ══════════ SCREEN: HOME ══════════ -->
-  <div id="screen-home">
-    <div class="card">
-      <div class="card-title">Create a new room</div>
-      <input type="text" id="host-name" placeholder="Your name" maxlength="20" />
-      <button class="btn btn-primary btn-block" onclick="createRoom()">
-        ✦ Create room &amp; get code
-      </button>
+<!-- ══ HOME ══ -->
+<div id="s-home">
+  <div class="card">
+    <div class="ct">Create a new room</div>
+    <input type="text" id="h-name" placeholder="Your name" maxlength="20"/>
+    <label style="font-size:13px;color:var(--tm);display:block;margin-bottom:4px">Number of tickets per player</label>
+    <select id="h-tickets" style="margin-bottom:10px">
+      <option value="1">1 ticket</option>
+      <option value="2">2 tickets</option>
+      <option value="3">3 tickets</option>
+    </select>
+    <label style="font-size:13px;color:var(--tm);display:block;margin-bottom:4px">Custom prize names (optional)</label>
+    <div id="prize-names-wrap">
+      <div class="g2" style="margin-bottom:6px">
+        <input type="text" id="pn-early5" placeholder="Early Five" style="margin:0"/>
+        <input type="text" id="pn-top" placeholder="Top Line" style="margin:0"/>
+      </div>
+      <div class="g2" style="margin-bottom:6px">
+        <input type="text" id="pn-mid" placeholder="Middle Line" style="margin:0"/>
+        <input type="text" id="pn-bot" placeholder="Bottom Line" style="margin:0"/>
+      </div>
+      <input type="text" id="pn-house" placeholder="Full House" style="margin-bottom:8px"/>
     </div>
-
-    <div class="card">
-      <div class="card-title">Join a room</div>
-      <input type="text" id="join-name" placeholder="Your name" maxlength="20" />
-      <input type="text" id="join-code" class="code-input" placeholder="ROOM CODE" maxlength="6"
-        oninput="this.value=this.value.toUpperCase()" />
-      <button class="btn btn-primary btn-block" onclick="joinRoom()">
-        → Join room
-      </button>
-    </div>
-
-    <div class="card" style="text-align:center;padding:1rem;">
-      <p style="font-size:13px;color:var(--text-muted);">
-        🔒 No login needed · Works on mobile · Up to 20 players
-      </p>
-    </div>
+    <button class="btn btn-p btn-block" onclick="createRoom()">✦ Create room</button>
   </div>
-
-  <!-- ══════════ SCREEN: LOBBY ══════════ -->
-  <div id="screen-lobby" class="hidden">
-    <div id="lobby-status-pill" class="status-pill">
-      <span class="dot pulse"></span> Waiting for players…
-    </div>
-
-    <div class="card">
-      <div class="card-title">Share this code with friends</div>
-      <div class="room-code-display" id="display-code">——</div>
-      <div class="share-box">
-        <p style="font-size:13px;font-weight:600;color:var(--green-dark);">Share this link:</p>
-        <p class="share-url" id="share-url">—</p>
-        <button class="btn btn-sm" style="margin-top:8px;" onclick="copyLink()">📋 Copy link</button>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">Players (<span id="lobby-player-count">0</span>)</div>
-      <div class="players-list" id="lobby-players"></div>
-    </div>
-
-    <div id="host-lobby-btn">
-      <button class="btn btn-primary btn-block" style="padding:14px;" onclick="startGame()">
-        ▶ Start game for everyone
-      </button>
-      <p style="text-align:center;font-size:12px;color:var(--text-muted);margin-top:6px;">
-        Only you (the host) can start the game
-      </p>
-    </div>
-    <div id="guest-lobby-msg" class="hidden" style="text-align:center;padding:12px;font-size:14px;color:var(--text-muted);">
-      Waiting for host to start the game…
-    </div>
+  <div class="card">
+    <div class="ct">Join a room</div>
+    <input type="text" id="j-name" placeholder="Your name" maxlength="20"/>
+    <input type="text" id="j-code" class="code-inp" placeholder="ROOM CODE" maxlength="6" oninput="this.value=this.value.toUpperCase()"/>
+    <button class="btn btn-p btn-block" onclick="joinRoom()">→ Join room</button>
   </div>
-
-  <!-- ══════════ SCREEN: GAME ══════════ -->
-  <div id="screen-game" class="hidden">
-    <div id="game-status-pill" class="status-pill live">
-      <span class="dot"></span> Game live · Room: <strong id="game-room-label">—</strong>
-    </div>
-
-    <div class="tabs">
-      <button class="tab active" id="tab-btn-ticket" onclick="switchTab('ticket')">🎫 My Ticket</button>
-      <button class="tab" id="tab-btn-caller" onclick="switchTab('caller')">📢 Caller</button>
-      <button class="tab" id="tab-btn-prizes" onclick="switchTab('prizes')">🏆 Prizes</button>
-    </div>
-
-    <!-- Ticket tab -->
-    <div id="tab-ticket">
-      <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-          <span class="card-title" style="margin:0;">Your ticket</span>
-          <span id="ticket-progress" style="font-size:13px;color:var(--text-muted);">0/15</span>
-        </div>
-        <div class="ticket-wrap">
-          <div class="ticket" id="ticket-grid"></div>
-        </div>
-        <div class="claim-strip" id="claim-strip"></div>
-      </div>
-    </div>
-
-    <!-- Caller tab -->
-    <div id="tab-caller" class="hidden">
-      <div class="card">
-        <div class="big-label" id="caller-label">Last called number</div>
-        <div class="big-number" id="big-number">—</div>
-
-        <div id="host-call-controls" class="hidden" style="text-align:center;margin-bottom:1rem;">
-          <button class="btn btn-primary" style="padding:12px 36px;font-size:16px;" onclick="callNext()" id="call-btn">
-            🔔 Call next number
-          </button>
-          <p style="font-size:12px;color:var(--text-muted);margin-top:6px;">You are the host — tap to call numbers for everyone</p>
-        </div>
-        <div id="guest-call-info" class="hidden" style="text-align:center;margin-bottom:1rem;font-size:13px;color:var(--text-muted);">
-          Waiting for host to call the next number…
-        </div>
-
-        <hr class="divider" />
-        <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-          <span style="font-size:13px;font-weight:600;">Called numbers</span>
-          <span style="font-size:13px;color:var(--text-muted);"><span id="called-count">0</span>/90</span>
-        </div>
-        <div class="balls-wrap" id="balls-wrap"></div>
-      </div>
-    </div>
-
-    <!-- Prizes tab -->
-    <div id="tab-prizes" class="hidden">
-      <div class="card">
-        <div class="card-title">Prize winners</div>
-        <div class="prizes-grid" id="prizes-grid"></div>
-      </div>
-      <div class="card">
-        <div class="card-title">Players</div>
-        <div class="players-list" id="game-players"></div>
-      </div>
-    </div>
-  </div>
-
-  <footer>Made with ♥ · Works on GitHub Pages</footer>
 </div>
 
-<!-- Firebase SDK -->
+<!-- ══ LOBBY ══ -->
+<div id="s-lobby" class="hidden">
+  <div class="spill"><span class="dot pulse"></span><span id="lob-status">Waiting for players…</span></div>
+  <div class="card">
+    <div class="ct">Share this code with friends</div>
+    <div class="rcode" id="disp-code">——</div>
+    <div class="share-box">
+      <p style="font-size:13px;font-weight:600;color:var(--gd)">Or share this link directly:</p>
+      <p class="share-url" id="share-url">—</p>
+      <button class="btn btn-sm" style="margin-top:6px" onclick="copyLink()">📋 Copy link</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct">Players in room (<span id="lob-count">0</span>)</div>
+    <div id="lob-players" class="players-list" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+  </div>
+  <div id="host-lob">
+    <button class="btn btn-p btn-block" style="padding:13px" onclick="startGame()">▶ Start game for everyone</button>
+    <p style="text-align:center;font-size:12px;color:var(--tm);margin-top:4px">Only you (host) can start</p>
+  </div>
+  <div id="guest-lob" class="hidden" style="text-align:center;padding:10px;font-size:14px;color:var(--tm)">
+    Waiting for host to start…
+  </div>
+</div>
+
+<!-- ══ GAME ══ -->
+<div id="s-game" class="hidden">
+  <div class="spill live"><span class="dot"></span>Live · Room: <strong id="game-room">—</strong></div>
+
+  <div class="tabs">
+    <button class="tab active" id="tb-ticket" onclick="switchTab('ticket')">🎫 Ticket</button>
+    <button class="tab" id="tb-caller" onclick="switchTab('caller')">📢 Caller</button>
+    <button class="tab" id="tb-manual" onclick="switchTab('manual')">✋ Manual</button>
+    <button class="tab" id="tb-prizes" onclick="switchTab('prizes')">🏆 Winners</button>
+    <button class="tab" id="tb-chat" onclick="switchTab('chat')">💬 Chat</button>
+  </div>
+
+  <!-- TICKET TAB -->
+  <div id="tab-ticket">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span class="ct" style="margin:0">Your ticket(s)</span>
+        <span id="tick-progress" style="font-size:12px;color:var(--tm)"></span>
+      </div>
+      <div class="ticket-tabs" id="tick-nav"></div>
+      <div class="ticket-wrap">
+        <div class="ticket" id="tick-grid"></div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px" id="claim-strip"></div>
+    </div>
+  </div>
+
+  <!-- CALLER TAB -->
+  <div id="tab-caller" class="hidden">
+    <div class="card">
+      <div class="big-lbl" id="caller-lbl">Waiting for first number…</div>
+      <div class="big-num" id="big-num">—</div>
+
+      <!-- HOST controls -->
+      <div id="host-caller" class="hidden">
+        <div class="timer-row">
+          <label>Auto-call speed:</label>
+          <div class="speed-btns">
+            <button class="spd" onclick="setSpeed(0)" id="spd-off">Off</button>
+            <button class="spd active" onclick="setSpeed(5)" id="spd-5">5s</button>
+            <button class="spd" onclick="setSpeed(10)" id="spd-10">10s</button>
+            <button class="spd" onclick="setSpeed(15)" id="spd-15">15s</button>
+          </div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-p" style="flex:1;padding:11px" onclick="callNext()" id="call-btn">🔔 Call next</button>
+          <button class="btn btn-am btn-sm" id="auto-btn" onclick="toggleAuto()">▶ Auto</button>
+        </div>
+        <p style="font-size:11px;color:var(--tm);margin-top:6px;text-align:center">You are the host — call numbers for everyone</p>
+      </div>
+
+      <!-- GUEST info -->
+      <div id="guest-caller" class="hidden" style="text-align:center;font-size:13px;color:var(--tm);margin-bottom:10px">
+        Waiting for host to call the next number…
+      </div>
+
+      <hr style="border:none;border-top:1px solid var(--bd);margin:10px 0"/>
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+        <span style="font-size:13px;font-weight:600">Called numbers</span>
+        <span style="font-size:12px;color:var(--tm)"><span id="called-cnt">0</span>/90</span>
+      </div>
+      <div class="balls-wrap" id="balls"></div>
+    </div>
+  </div>
+
+  <!-- MANUAL TAB -->
+  <div id="tab-manual" class="hidden">
+    <div class="card">
+      <div class="ct">Manual number board</div>
+      <p style="font-size:12px;color:var(--tm);margin-bottom:10px">
+        Tap any number when host announces it. 
+        <span style="color:var(--am);font-weight:600">Yellow</span> = you tapped · 
+        <span style="color:var(--g);font-weight:600">Green</span> = matches called · 
+        <span style="color:var(--r);font-weight:600">Red</span> = wrong (not called yet)
+      </p>
+      <div class="manual-grid" id="manual-grid"></div>
+      <div style="margin-top:10px;font-size:12px;color:var(--tm)">
+        Tapped: <span id="manual-tapped-count" style="font-weight:700;color:var(--tx)">0</span> numbers ·
+        Correct: <span id="manual-correct-count" style="font-weight:700;color:var(--g)">0</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRIZES / WINNERS TAB -->
+  <div id="tab-prizes" class="hidden">
+    <div class="card">
+      <div class="ct">Prize winners 🏆</div>
+      <div class="prize-grid" id="prizes-grid"></div>
+    </div>
+    <div class="card">
+      <div class="ct">Leaderboard</div>
+      <div id="leaderboard"></div>
+    </div>
+    <div class="card">
+      <div class="ct">All players</div>
+      <div id="game-players" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+    </div>
+  </div>
+
+  <!-- CHAT TAB -->
+  <div id="tab-chat" class="hidden">
+    <div class="card">
+      <div class="ct">Room chat 💬</div>
+      <div class="chat-box" id="chat-box"></div>
+      <div class="chat-row">
+        <input type="text" id="chat-inp" placeholder="Type a message…" maxlength="120"
+          onkeydown="if(event.key==='Enter')sendChat()" style="margin:0"/>
+        <button class="btn btn-p btn-sm" onclick="sendChat()">Send</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>🎱 Tambola · Free to play · Works on mobile . Create by Sumit Shrivas</footer>
+</div>
+
+<!-- Firebase -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, set, get, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, set, get, onValue, update, push, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-// ─────────────────────────────────────────────
-// 🔧 CONFIGURATION — Replace with your own Firebase project
-//    Steps:
-//    1. Go to https://console.firebase.google.com
-//    2. Create a new project (free)
-//    3. Add a Web App → copy the firebaseConfig below
-//    4. Go to Realtime Database → Create database (test mode)
-//    5. Paste your config here and push to GitHub!
-// ─────────────────────────────────────────────
+// ── CONFIG (already filled with your project) ──
 const firebaseConfig = {
   apiKey: "AIzaSyCNSzq8jMb8uk4hKjhotHB4b6QwJykbMyM",
   authDomain: "tambola-66a73.firebaseapp.com",
@@ -440,319 +374,468 @@ const firebaseConfig = {
   measurementId: "G-N6FEMDMT7N"
 };
 
-// ─── Init ────────────────────────────────────
 let app, db;
-try {
-  app = initializeApp(firebaseConfig);
-  db = getDatabase(app);
-  window._dbReady = true;
-} catch(e) {
-  window._dbReady = false;
-  console.warn("Firebase not configured:", e.message);
-}
+try { app = initializeApp(firebaseConfig); db = getDatabase(app); window._dbOk = true; }
+catch(e) { window._dbOk = false; }
 
-// ─── State ───────────────────────────────────
-window.myName = "";
-window.myRoom = "";
-window.isHost = false;
-window.myTicket = [];
-window.gameListener = null;
+// ── STATE ──
+let myName='', myRoom='', isHost=false;
+let myTickets=[], activeTicket=0;
+let manualMarked = new Set();
+let autoTimer=null, autoSpeed=5, autoRunning=false, progInterval=null, progStart=0;
+let lastCalledLen=0, chatListener=null, roomListener=null;
 
-// ─── Helpers ─────────────────────────────────
-function genCode() {
-  return Math.random().toString(36).substring(2, 8).toUpperCase();
-}
-
-function genTicket() {
-  const ticket = [];
-  for (let row = 0; row < 3; row++) {
-    const rowData = new Array(9).fill(0);
-    const cols = [...Array(9).keys()].sort(() => Math.random() - 0.5).slice(0, 5).sort((a,b)=>a-b);
-    cols.forEach(col => {
-      const lo = col === 0 ? 1 : col * 10;
-      const hi = col === 8 ? 90 : col * 10 + 9;
-      rowData[col] = Math.floor(Math.random() * (hi - lo + 1)) + lo;
+// ── HELPERS ──
+const $ = id => document.getElementById(id);
+function genCode(){ return Math.random().toString(36).substring(2,8).toUpperCase() }
+function genTicket(){
+  const t=[];
+  for(let r=0;r<3;r++){
+    const row=new Array(9).fill(0);
+    const cols=[...Array(9).keys()].sort(()=>Math.random()-.5).slice(0,5).sort((a,b)=>a-b);
+    cols.forEach(c=>{
+      const lo=c===0?1:c*10, hi=c===8?90:c*10+9;
+      row[c]=Math.floor(Math.random()*(hi-lo+1))+lo;
     });
-    ticket.push(rowData);
+    t.push(row);
   }
-  return ticket;
+  return t;
 }
+function flatNums(t){ return t.flat().filter(n=>n>0) }
 
-function flatNums(ticket) {
-  return ticket.flat().filter(n => n > 0);
+function showAlert(msg,type='ok'){
+  const b=$('alertbox');
+  b.className='alert alert-'+(type==='ok'?'ok':'err');
+  b.textContent=msg; b.classList.remove('hidden');
+  setTimeout(()=>b.classList.add('hidden'),3500);
 }
-
-function showAlert(msg, type = "success") {
-  const box = document.getElementById("alert-box");
-  box.className = "alert alert-" + type;
-  box.textContent = msg;
-  box.classList.remove("hidden");
-  setTimeout(() => box.classList.add("hidden"), 4000);
-}
-
-function showBanner(msg) {
-  const b = document.createElement("div");
-  b.className = "win-banner";
-  b.textContent = msg;
+function showBanner(msg){
+  document.querySelectorAll('.win-banner').forEach(e=>e.remove());
+  const b=document.createElement('div');
+  b.className='win-banner'; b.textContent=msg;
   document.body.appendChild(b);
-  setTimeout(() => b.remove(), 4000);
+  setTimeout(()=>b.remove(),4500);
 }
-
-window.copyLink = function() {
-  const url = document.getElementById("share-url").textContent;
-  navigator.clipboard.writeText(url).then(() => showAlert("Link copied!")).catch(() => showAlert("Copy: " + url));
+window.copyLink=()=>{
+  const u=$('share-url').textContent;
+  navigator.clipboard.writeText(u).then(()=>showAlert('Link copied!')).catch(()=>showAlert(u));
 };
 
-// ─── DB helpers ──────────────────────────────
-async function dbSet(path, data) {
-  if (!window._dbReady) { useFallback(); return; }
-  await set(ref(db, path), data);
+// ── SOUND ──
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let actx;
+function getACtx(){ if(!actx) actx=new AudioCtx(); return actx; }
+function beep(freq=440, dur=0.18, vol=0.4, type='sine'){
+  try{
+    const ctx=getACtx(), osc=ctx.createOscillator(), g=ctx.createGain();
+    osc.connect(g); g.connect(ctx.destination);
+    osc.type=type; osc.frequency.value=freq;
+    g.gain.setValueAtTime(vol,ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+dur);
+    osc.start(); osc.stop(ctx.currentTime+dur);
+  }catch(e){}
+}
+function playCallSound(){
+  beep(523,.12,.35,'sine');
+  setTimeout(()=>beep(659,.15,.3,'sine'),130);
+  setTimeout(()=>beep(784,.25,.25,'sine'),270);
+}
+function playClaimSound(){
+  [523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.18,.3,'triangle'),i*100));
+}
+function speakNumber(n){
+  if(!window.speechSynthesis) return;
+  const u=new SpeechSynthesisUtterance(String(n));
+  u.lang='en-IN'; u.rate=0.85; u.pitch=1.1;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(u);
 }
 
-async function dbGet(path) {
-  if (!window._dbReady) return null;
-  const snap = await get(ref(db, path));
-  return snap.exists() ? snap.val() : null;
-}
+// ── DB ──
+async function dbSet(path,data){ await set(ref(db,path),data) }
+async function dbGet(path){ const s=await get(ref(db,path)); return s.exists()?s.val():null }
+async function dbUpd(path,data){ await update(ref(db,path),data) }
+function dbListen(path,cb){ return onValue(ref(db,path),s=>cb(s.exists()?s.val():null)) }
 
-async function dbUpdate(path, data) {
-  if (!window._dbReady) { useFallback(); return; }
-  await update(ref(db, path), data);
-}
-
-function dbListen(path, cb) {
-  if (!window._dbReady) return () => {};
-  const unsubscribe = onValue(ref(db, path), snap => {
-    cb(snap.exists() ? snap.val() : null);
-  });
-  return unsubscribe;
-}
-
-function useFallback() {
-  showAlert("⚠️ Firebase not configured yet! See README.md for setup steps.", "error");
-}
-
-// ─── Create Room ─────────────────────────────
-window.createRoom = async function() {
-  if (!window._dbReady) { useFallback(); return; }
-  const name = document.getElementById("host-name").value.trim();
-  if (!name) { showAlert("Please enter your name", "error"); return; }
-
-  window.myName = name;
-  window.myRoom = genCode();
-  window.isHost = true;
-  window.myTicket = genTicket();
-
-  const roomData = {
-    code: window.myRoom,
-    host: name,
-    status: "lobby",
-    created: Date.now(),
-    players: { [name]: { ticket: window.myTicket, joined: Date.now() } },
-    called: [],
-    winners: {}
-  };
-
-  await dbSet(`rooms/${window.myRoom}`, roomData);
-  showLobby();
-  startListening();
-};
-
-// ─── Join Room ───────────────────────────────
-window.joinRoom = async function() {
-  if (!window._dbReady) { useFallback(); return; }
-  const name = document.getElementById("join-name").value.trim();
-  const code = document.getElementById("join-code").value.trim().toUpperCase();
-  if (!name) { showAlert("Enter your name", "error"); return; }
-  if (code.length < 4) { showAlert("Enter the room code", "error"); return; }
-
-  const room = await dbGet(`rooms/${code}`);
-  if (!room) { showAlert("Room not found! Check the code.", "error"); return; }
-  if (room.status === "playing") { showAlert("Game already started!", "error"); return; }
-
-  window.myName = name;
-  window.myRoom = code;
-  window.isHost = false;
-
-  if (room.players && room.players[name]) {
-    window.myTicket = room.players[name].ticket;
-  } else {
-    window.myTicket = genTicket();
-    await dbUpdate(`rooms/${code}/players/${name}`, { ticket: window.myTicket, joined: Date.now() });
-  }
-
-  showLobby();
-  startListening();
-};
-
-// ─── Start Game ──────────────────────────────
-window.startGame = async function() {
-  if (!window.isHost) return;
-  await dbUpdate(`rooms/${window.myRoom}`, { status: "playing", startedAt: Date.now() });
-};
-
-// ─── Call Number ─────────────────────────────
-window.callNext = async function() {
-  if (!window.isHost) return;
-  const room = await dbGet(`rooms/${window.myRoom}`);
-  if (!room) return;
-  const called = room.called || [];
-  const remaining = [];
-  for (let i = 1; i <= 90; i++) if (!called.includes(i)) remaining.push(i);
-  if (remaining.length === 0) { showAlert("All 90 numbers called!"); return; }
-  const num = remaining[Math.floor(Math.random() * remaining.length)];
-  await dbUpdate(`rooms/${window.myRoom}`, { called: [...called, num] });
-};
-
-// ─── Claim Prize ─────────────────────────────
-window.claimPrize = async function(key) {
-  const room = await dbGet(`rooms/${window.myRoom}`);
-  if (!room) return;
-  if (room.winners && room.winners[key]) { showAlert("Already claimed!", "error"); return; }
-  const called = new Set(room.called || []);
-  if (!checkPrize(key, called, window.myTicket)) { showAlert("Not valid yet!", "error"); return; }
-  await dbUpdate(`rooms/${window.myRoom}/winners`, { [key]: window.myName });
-  showBanner("🎉 " + window.myName + " claimed " + PRIZES.find(p => p.key===key).label + "!");
-};
-
-// ─── Prizes ──────────────────────────────────
-const PRIZES = [
-  { key: "early5", label: "Early Five" },
-  { key: "top",    label: "Top line" },
-  { key: "mid",    label: "Middle line" },
-  { key: "bot",    label: "Bottom line" },
-  { key: "house",  label: "Full house" }
+// ── PRIZES (default or custom) ──
+let PRIZES=[
+  {key:'early5',label:'Early Five'},
+  {key:'top',   label:'Top Line'},
+  {key:'mid',   label:'Middle Line'},
+  {key:'bot',   label:'Bottom Line'},
+  {key:'house', label:'Full House'}
 ];
+function getPrizeLabel(key){ return PRIZES.find(p=>p.key===key)?.label||key }
 
-function checkPrize(key, called, ticket) {
-  const ok = n => n > 0 && called.has(n);
-  if (key === "early5") return flatNums(ticket).filter(n => called.has(n)).length >= 5;
-  if (key === "top")    return ticket[0].every(ok);
-  if (key === "mid")    return ticket[1].every(ok);
-  if (key === "bot")    return ticket[2].every(ok);
-  if (key === "house")  return ticket.flat().every(n => n === 0 || called.has(n));
+function checkPrize(key,called,ticket){
+  const ok=n=>n>0&&called.has(n);
+  if(key==='early5') return flatNums(ticket).filter(n=>called.has(n)).length>=5;
+  if(key==='top')    return ticket[0].every(ok);
+  if(key==='mid')    return ticket[1].every(ok);
+  if(key==='bot')    return ticket[2].every(ok);
+  if(key==='house')  return ticket.flat().every(n=>n===0||called.has(n));
   return false;
 }
 
-// ─── Screens ─────────────────────────────────
-function showLobby() {
-  document.getElementById("screen-home").classList.add("hidden");
-  document.getElementById("screen-lobby").classList.remove("hidden");
-  document.getElementById("display-code").textContent = window.myRoom;
+// ── CREATE ROOM ──
+window.createRoom=async function(){
+  if(!window._dbOk){showAlert('Firebase not configured','err');return}
+  const name=$('h-name').value.trim();
+  if(!name){showAlert('Enter your name','err');return}
+  const ticketCount=parseInt($('h-tickets').value)||1;
+  const customPrizes={
+    early5: $('pn-early5').value.trim()||'Early Five',
+    top:    $('pn-top').value.trim()||'Top Line',
+    mid:    $('pn-mid').value.trim()||'Middle Line',
+    bot:    $('pn-bot').value.trim()||'Bottom Line',
+    house:  $('pn-house').value.trim()||'Full House'
+  };
+  PRIZES=PRIZES.map(p=>({...p,label:customPrizes[p.key]}));
 
-  const url = `${location.origin}${location.pathname}?room=${window.myRoom}`;
-  document.getElementById("share-url").textContent = url;
+  myName=name; myRoom=genCode(); isHost=true;
+  myTickets=Array.from({length:ticketCount},()=>genTicket());
 
-  if (window.isHost) {
-    document.getElementById("host-lobby-btn").classList.remove("hidden");
-    document.getElementById("guest-lobby-msg").classList.add("hidden");
+  await dbSet(`rooms/${myRoom}`,{
+    code:myRoom, host:name, status:'lobby', created:Date.now(),
+    ticketCount, prizeNames:customPrizes,
+    players:{[name]:{tickets:myTickets, joined:Date.now()}},
+    called:[], winners:{}, chat:{}
+  });
+  showLobby(); startListening();
+};
+
+// ── JOIN ROOM ──
+window.joinRoom=async function(){
+  if(!window._dbOk){showAlert('Firebase not configured','err');return}
+  const name=$('j-name').value.trim();
+  const code=$('j-code').value.trim().toUpperCase();
+  if(!name){showAlert('Enter your name','err');return}
+  if(code.length<4){showAlert('Enter room code','err');return}
+
+  const room=await dbGet(`rooms/${code}`);
+  if(!room){showAlert('Room not found!','err');return}
+  if(room.status==='playing'){showAlert('Game already started!','err');return}
+
+  myName=name; myRoom=code; isHost=false;
+  const ticketCount=room.ticketCount||1;
+  if(room.prizeNames) PRIZES=PRIZES.map(p=>({...p,label:room.prizeNames[p.key]||p.label}));
+
+  if(room.players&&room.players[name]){
+    myTickets=room.players[name].tickets||[room.players[name].ticket||genTicket()];
   } else {
-    document.getElementById("host-lobby-btn").classList.add("hidden");
-    document.getElementById("guest-lobby-msg").classList.remove("hidden");
+    myTickets=Array.from({length:ticketCount},()=>genTicket());
+    await dbUpd(`rooms/${code}/players/${name}`,{tickets:myTickets,joined:Date.now()});
   }
+  showLobby(); startListening();
+};
+
+// ── START GAME ──
+window.startGame=async function(){
+  if(!isHost) return;
+  await dbUpd(`rooms/${myRoom}`,{status:'playing',startedAt:Date.now()});
+  addSystemChat('Game started! Good luck everyone! 🎱');
+};
+
+// ── CALL NUMBER ──
+window.callNext=async function(){
+  if(!isHost) return;
+  const room=await dbGet(`rooms/${myRoom}`);
+  if(!room) return;
+  const called=room.called||[];
+  const rem=[];
+  for(let i=1;i<=90;i++) if(!called.includes(i)) rem.push(i);
+  if(rem.length===0){showAlert('All 90 numbers called!');stopAuto();return}
+  const num=rem[Math.floor(Math.random()*rem.length)];
+  await dbUpd(`rooms/${myRoom}`,{called:[...called,num]});
+};
+
+// ── AUTO CALL ──
+window.setSpeed=function(s){
+  autoSpeed=s;
+  ['off','5','10','15'].forEach(x=>$('spd-'+x)?.classList.remove('active'));
+  $('spd-'+(s===0?'off':s))?.classList.add('active');
+  if(s===0) stopAuto();
+  else if(autoRunning) startAutoTimer();
+};
+window.toggleAuto=function(){
+  if(autoRunning) stopAuto();
+  else startAutoLoop();
+};
+function startAutoLoop(){
+  if(autoSpeed===0){showAlert('Set a speed first','err');return}
+  autoRunning=true;
+  $('auto-btn').textContent='⏹ Stop';
+  $('auto-btn').classList.add('btn-r');
+  $('auto-btn').classList.remove('btn-am');
+  startAutoTimer();
+}
+function startAutoTimer(){
+  clearInterval(autoTimer); clearInterval(progInterval);
+  progStart=Date.now();
+  const dur=autoSpeed*1000;
+  $('prog-fill').style.transition='none';
+  $('prog-fill').style.width='0%';
+  setTimeout(()=>{
+    $('prog-fill').style.transition=`width ${autoSpeed}s linear`;
+    $('prog-fill').style.width='100%';
+  },30);
+  progInterval=setInterval(()=>{
+    const pct=Math.min(100,((Date.now()-progStart)/dur)*100);
+    // handled by CSS transition
+  },200);
+  autoTimer=setTimeout(async()=>{
+    if(!autoRunning) return;
+    await callNext();
+    if(autoRunning) startAutoTimer();
+  },dur);
+}
+function stopAuto(){
+  autoRunning=false;
+  clearTimeout(autoTimer); clearInterval(progInterval);
+  $('prog-fill').style.transition='none';
+  $('prog-fill').style.width='0%';
+  const ab=$('auto-btn');
+  if(ab){ab.textContent='▶ Auto';ab.classList.remove('btn-r');ab.classList.add('btn-am')}
 }
 
-function showGame(room) {
-  document.getElementById("screen-lobby").classList.add("hidden");
-  document.getElementById("screen-game").classList.remove("hidden");
-  document.getElementById("game-room-label").textContent = window.myRoom;
+// ── CLAIM PRIZE ──
+window.claimPrize=async function(key){
+  const room=await dbGet(`rooms/${myRoom}`);
+  if(!room) return;
+  if(room.winners?.[key]){showAlert('Already claimed!','err');return}
+  const called=new Set(room.called||[]);
+  const valid=myTickets.some(t=>checkPrize(key,called,t));
+  if(!valid){showAlert('Not valid yet!','err');return}
+  await dbUpd(`rooms/${myRoom}/winners`,{[key]:myName});
+  playClaimSound();
+  showBanner('🎉 '+myName+' claimed '+getPrizeLabel(key)+'!');
+  addSystemChat('🏆 '+myName+' just claimed '+getPrizeLabel(key)+'! Congratulations!');
+};
 
-  if (window.isHost) {
-    document.getElementById("host-call-controls").classList.remove("hidden");
-    document.getElementById("guest-call-info").classList.add("hidden");
-  } else {
-    document.getElementById("host-call-controls").classList.add("hidden");
-    document.getElementById("guest-call-info").classList.remove("hidden");
+// ── MANUAL NUMBER BOARD ──
+window.toggleManual=function(n){
+  if(manualMarked.has(n)) manualMarked.delete(n);
+  else manualMarked.add(n);
+  renderManualGrid(window._lastCalled||new Set());
+};
+
+function renderManualGrid(called){
+  const g=$('manual-grid');
+  if(!g) return;
+  let html='';
+  for(let i=1;i<=90;i++){
+    const isCalled=called.has(i);
+    const isMarked=manualMarked.has(i);
+    let cls='mnum';
+    if(isCalled) cls+=' called';
+    if(isMarked && isCalled) cls+=' manual-marked called';
+    else if(isMarked && !isCalled) cls+=' manual-marked wrong';
+    else if(!isMarked && isCalled) cls+=' called';
+    html+=`<div class="${cls}" onclick="toggleManual(${i})">${i}</div>`;
   }
+  g.innerHTML=html;
+  const tapped=manualMarked.size;
+  const correct=[...manualMarked].filter(n=>called.has(n)).length;
+  $('manual-tapped-count').textContent=tapped;
+  $('manual-correct-count').textContent=correct;
 }
 
-// ─── Render ──────────────────────────────────
-function renderRoom(room) {
-  if (!room) return;
+// ── CHAT ──
+window.sendChat=async function(){
+  const inp=$('chat-inp');
+  const msg=inp.value.trim();
+  if(!msg) return;
+  inp.value='';
+  await push(ref(db,`rooms/${myRoom}/chat`),{
+    who:myName, msg, ts:Date.now()
+  });
+};
+async function addSystemChat(msg){
+  await push(ref(db,`rooms/${myRoom}/chat`),{who:'__sys__',msg,ts:Date.now()});
+}
+function listenChat(){
+  if(chatListener) chatListener();
+  chatListener=dbListen(`rooms/${myRoom}/chat`,data=>{
+    const box=$('chat-box'); if(!box) return;
+    const msgs=data?Object.values(data).sort((a,b)=>a.ts-b.ts):[];
+    box.innerHTML=msgs.map(m=>{
+      if(m.who==='__sys__') return `<div class="chat-msg sys">${esc(m.msg)}</div>`;
+      const isMe=m.who===myName;
+      return `<div class="chat-msg ${isMe?'me':''}"><span class="who">${esc(m.who)}</span>: ${esc(m.msg)}</div>`;
+    }).join('');
+    box.scrollTop=box.scrollHeight;
+  });
+}
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
 
-  // Lobby players
-  const playersObj = room.players || {};
-  const names = Object.keys(playersObj);
-  document.getElementById("lobby-player-count").textContent = names.length;
-  document.getElementById("lobby-players").innerHTML = names.map(n =>
-    `<span class="player-chip ${n === room.host ? "host" : ""} ${n === window.myName ? "me" : ""}">${n === room.host ? "★ " : ""}${n}</span>`
-  ).join("");
+// ── SCREENS ──
+function showLobby(){
+  $('s-home').classList.add('hidden');
+  $('s-lobby').classList.remove('hidden');
+  $('disp-code').textContent=myRoom;
+  $('share-url').textContent=`${location.origin}${location.pathname}?room=${myRoom}`;
+  if(isHost){ $('host-lob').classList.remove('hidden'); $('guest-lob').classList.add('hidden'); }
+  else { $('host-lob').classList.add('hidden'); $('guest-lob').classList.remove('hidden'); }
+}
+function showGame(){
+  $('s-lobby').classList.add('hidden');
+  $('s-game').classList.remove('hidden');
+  $('game-room').textContent=myRoom;
+  if(isHost){ $('host-caller').classList.remove('hidden'); $('guest-caller').classList.add('hidden'); }
+  else { $('host-caller').classList.add('hidden'); $('guest-caller').classList.remove('hidden'); }
+  buildTicketNav();
+  listenChat();
+}
 
-  if (room.status === "playing") {
-    if (document.getElementById("screen-game").classList.contains("hidden")) showGame(room);
+// ── TICKET NAV ──
+function buildTicketNav(){
+  const nav=$('tick-nav');
+  if(myTickets.length<=1){nav.innerHTML='';return}
+  nav.innerHTML=myTickets.map((_,i)=>
+    `<button class="ttab ${i===0?'active':''}" id="ttab-${i}" onclick="selectTicket(${i})">Ticket ${i+1}</button>`
+  ).join('');
+}
+window.selectTicket=function(i){
+  activeTicket=i;
+  myTickets.forEach((_,j)=>{
+    const t=$('ttab-'+j); if(t) t.classList.toggle('active',j===i);
+  });
+  renderTicket(window._lastCalled||new Set(), window._lastRoom);
+};
+
+// ── RENDER ──
+function renderRoom(room){
+  if(!room) return;
+  const players=room.players||{};
+  const names=Object.keys(players);
+  $('lob-count').textContent=names.length;
+  $('lob-status').textContent=`${names.length} player(s) in room`;
+  $('lob-players').innerHTML=names.map(n=>
+    `<span class="chip ${n===room.host?'host':''} ${n===myName?'me':''}">${n===room.host?'★ ':''}${n}</span>`
+  ).join('');
+
+  if(room.status==='playing'){
+    if($('s-game').classList.contains('hidden')) showGame();
     renderGame(room);
   }
 }
 
-function renderGame(room) {
-  const called = new Set(room.called || []);
-  const nums = room.called || [];
+function renderGame(room){
+  const calledArr=room.called||[];
+  const called=new Set(calledArr);
+  window._lastCalled=called;
+  window._lastRoom=room;
 
-  // Big number
-  const latest = nums.length > 0 ? nums[nums.length - 1] : null;
-  document.getElementById("big-number").textContent = latest || "—";
-  document.getElementById("caller-label").textContent = latest ? "Last called number" : "Game started — waiting for first number";
-  document.getElementById("called-count").textContent = nums.length;
+  // sound on new number
+  if(calledArr.length>lastCalledLen && calledArr.length>0){
+    const latest=calledArr[calledArr.length-1];
+    playCallSound();
+    speakNumber(latest);
+    lastCalledLen=calledArr.length;
+  }
 
-  // Balls
-  const ballsEl = document.getElementById("balls-wrap");
-  const reversed = [...nums].reverse();
-  ballsEl.innerHTML = reversed.map((n, i) =>
-    `<div class="ball ${i === 0 ? "latest" : "called"}">${n}</div>`
-  ).join("");
+  // big number
+  const latest=calledArr.length>0?calledArr[calledArr.length-1]:null;
+  $('big-num').textContent=latest||'—';
+  $('caller-lbl').textContent=latest?`Number called:`:'Waiting for first number…';
+  $('called-cnt').textContent=calledArr.length;
 
-  // Ticket
-  const grid = document.getElementById("ticket-grid");
-  const myNums = flatNums(window.myTicket);
-  const matched = myNums.filter(n => called.has(n));
-  document.getElementById("ticket-progress").textContent = `${matched.length}/${myNums.length}`;
+  // balls
+  const rev=[...calledArr].reverse();
+  $('balls').innerHTML=rev.map((n,i)=>`<div class="ball ${i===0?'latest':'called'}">${n}</div>`).join('');
 
-  grid.innerHTML = window.myTicket.flat().map(n => {
-    if (n === 0) return `<div class="tcell blank"></div>`;
-    return `<div class="tcell ${called.has(n) ? "hit" : ""}">${n}</div>`;
-  }).join("");
+  // ticket
+  renderTicket(called, room);
 
-  // Claim buttons
-  const strip = document.getElementById("claim-strip");
-  strip.innerHTML = PRIZES
-    .filter(p => !room.winners?.[p.key] && checkPrize(p.key, called, window.myTicket))
-    .map(p => `<button class="btn btn-primary btn-sm" onclick="claimPrize('${p.key}')">Claim: ${p.label}!</button>`)
-    .join("");
+  // manual
+  renderManualGrid(called);
 
-  // Prizes grid
-  document.getElementById("prizes-grid").innerHTML = PRIZES.map(p => `
-    <div class="prize-item">
-      <div class="prize-name">${p.label}</div>
-      <div class="prize-winner ${room.winners?.[p.key] ? "" : "empty"}">${room.winners?.[p.key] || "—"}</div>
-    </div>
-  `).join("");
+  // prizes & leaderboard
+  renderPrizes(room, called);
 
-  // Game players
-  const pObj = room.players || {};
-  document.getElementById("game-players").innerHTML = Object.keys(pObj).map(n =>
-    `<span class="player-chip ${n === room.host ? "host" : ""} ${n === window.myName ? "me" : ""}">${n === room.host ? "★ " : ""}${n}</span>`
-  ).join("");
+  // players
+  const pObj=room.players||{};
+  const winners=room.winners||{};
+  $('game-players').innerHTML=Object.keys(pObj).map(n=>{
+    const won=Object.values(winners).includes(n);
+    return `<span class="chip ${n===room.host?'host':''} ${n===myName?'me':''} ${won?'won':''}">${n===room.host?'★ ':''}${n}${won?' 🏆':''}</span>`;
+  }).join('');
 }
 
-// ─── Listen ──────────────────────────────────
-function startListening() {
-  if (window.gameListener) window.gameListener();
-  window.gameListener = dbListen(`rooms/${window.myRoom}`, renderRoom);
+function renderTicket(called, room){
+  const ticket=myTickets[activeTicket]||myTickets[0];
+  const allNums=flatNums(ticket);
+  const matched=allNums.filter(n=>called.has(n));
+  $('tick-progress').textContent=`Ticket ${activeTicket+1}: ${matched.length}/${allNums.length} matched`;
+
+  $('tick-grid').innerHTML=ticket.flat().map(n=>{
+    if(n===0) return `<div class="tcell blank"></div>`;
+    return `<div class="tcell ${called.has(n)?'hit':''}">${n}</div>`;
+  }).join('');
+
+  // update ticket nav badges
+  if(myTickets.length>1){
+    myTickets.forEach((t,i)=>{
+      const btn=$('ttab-'+i); if(!btn) return;
+      const claimable=PRIZES.some(p=>!(room?.winners?.[p.key]) && checkPrize(p.key,called,t));
+      btn.classList.toggle('has-win',claimable);
+    });
+  }
+
+  // claim buttons (check all tickets)
+  if(room){
+    $('claim-strip').innerHTML=PRIZES
+      .filter(p=>!(room.winners?.[p.key]) && myTickets.some(t=>checkPrize(p.key,called,t)))
+      .map(p=>`<button class="btn btn-p btn-sm" onclick="claimPrize('${p.key}')">🎉 Claim: ${getPrizeLabel(p.key)}!</button>`)
+      .join('');
+  }
 }
 
-// ─── Tab switching ───────────────────────────
-window.switchTab = function(tab) {
-  ["ticket","caller","prizes"].forEach(t => {
-    document.getElementById("tab-"+t).classList.toggle("hidden", t !== tab);
-    document.getElementById("tab-btn-"+t).classList.toggle("active", t === tab);
+function renderPrizes(room, called){
+  const winners=room.winners||{};
+  // prizes grid
+  $('prizes-grid').innerHTML=PRIZES.map(p=>{
+    const w=winners[p.key];
+    return `<div class="prize-card ${w?'won':''}">
+      <div class="pname">${getPrizeLabel(p.key)}</div>
+      <div class="pwinner ${w?'':'empty'}">${w||'—'}</div>
+    </div>`;
+  }).join('');
+
+  // leaderboard
+  const medals=['🥇','🥈','🥉','🏅','🏅'];
+  const entries=PRIZES.filter(p=>winners[p.key]).map((p,i)=>({
+    medal:medals[i]||'🏅', name:winners[p.key], prize:getPrizeLabel(p.key)
+  }));
+  if(entries.length===0){
+    $('leaderboard').innerHTML='<p style="font-size:13px;color:var(--tm)">No prizes claimed yet…</p>';
+  } else {
+    $('leaderboard').innerHTML=entries.map(e=>`
+      <div class="lb-row">
+        <div class="lb-medal">${e.medal}</div>
+        <div class="lb-name">${esc(e.name)}</div>
+        <span class="lb-badge">${esc(e.prize)}</span>
+      </div>`).join('');
+  }
+}
+
+// ── LISTEN ──
+function startListening(){
+  if(roomListener) roomListener();
+  roomListener=dbListen(`rooms/${myRoom}`,renderRoom);
+}
+
+// ── TAB SWITCH ──
+window.switchTab=function(tab){
+  ['ticket','caller','manual','prizes','chat'].forEach(t=>{
+    $('tab-'+t)?.classList.toggle('hidden',t!==tab);
+    $('tb-'+t)?.classList.toggle('active',t===tab);
   });
 };
 
-// ─── Auto-fill room from URL ──────────────────
-const urlRoom = new URLSearchParams(location.search).get("room");
-if (urlRoom) {
-  document.getElementById("join-code").value = urlRoom.toUpperCase();
-}
+// ── AUTO-FILL ROOM FROM URL ──
+const urlRoom=new URLSearchParams(location.search).get('room');
+if(urlRoom) $('j-code').value=urlRoom.toUpperCase();
 </script>
 </body>
 </html>
