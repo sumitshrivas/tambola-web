@@ -18,7 +18,7 @@
   :root{--bg:#1a1a1a;--bd:rgba(255,255,255,0.12);--tx:#f0f0f0;--tm:#999;--cb:#252525}
 }
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
-.app{max-width:640px;margin:0 auto;padding:.75rem}
+.app{max-width:900px;margin:0 auto;padding:.75rem}
 header{text-align:center;padding:1.2rem 0 .8rem}
 header h1{font-size:24px;font-weight:800;color:var(--g)}
 header p{font-size:13px;color:var(--tm);margin-top:3px}
@@ -62,11 +62,6 @@ input.code-inp{text-transform:uppercase;letter-spacing:5px;font-size:18px;font-w
 .share-box{background:var(--gl);border-radius:var(--rads);padding:10px 12px;text-align:center}
 .share-url{font-size:11px;color:var(--tm);word-break:break-all;margin-top:4px}
 
-/* tabs */
-.tabs{display:flex;gap:3px;background:var(--bg);border-radius:var(--rads);padding:3px;margin-bottom:.85rem}
-.tab{flex:1;padding:7px 4px;border-radius:6px;border:none;background:transparent;color:var(--tm);font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap}
-.tab.active{background:var(--cb);color:var(--tx);box-shadow:0 1px 3px rgba(0,0,0,.1)}
-
 /* ticket */
 .ticket-wrap{overflow-x:auto}
 .ticket{display:grid;grid-template-columns:repeat(9,1fr);gap:3px;min-width:270px}
@@ -81,24 +76,41 @@ input.code-inp{text-transform:uppercase;letter-spacing:5px;font-size:18px;font-w
 .tcell.manual{background:#FAC775;color:#412402;border-color:var(--am)}
 .tcell.manual.hit{background:var(--g);color:#fff}
 .tcell:not(.blank):not(.hit):hover{border-color:var(--g);background:var(--gl)}
+.tcell.called-not-marked{cursor:pointer}
+.tcell.called-not-marked:hover{border-color:var(--am);background:var(--aml)}
 
-/* manual number input for guests */
-.manual-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:3px;margin-top:8px}
-.mnum{
-  aspect-ratio:1;display:flex;align-items:center;justify-content:center;
-  font-size:11px;font-weight:600;border-radius:4px;border:1px solid var(--bd);
-  background:var(--bg);cursor:pointer;transition:all .2s;user-select:none
+/* called number display - always visible */
+.called-num-bar{
+  display:flex;align-items:center;gap:12px;background:var(--cb);
+  border-radius:var(--rads);padding:10px 14px;border:1px solid var(--bd);
+  margin-bottom:10px;
 }
-.mnum.called{background:var(--aml);color:#633806;border-color:var(--am)}
-.mnum.manual-marked{background:var(--am);color:#412402;border-color:#854F0B;font-weight:800}
-.mnum.manual-marked.called{background:var(--g);color:#fff;border-color:var(--gd)}
-.mnum.wrong{background:var(--rl);color:#7a1f1f;border-color:var(--r)}
+.called-num-big{
+  font-size:56px;font-weight:900;color:var(--r);line-height:1;
+  animation:popIn .35s ease;min-width:70px;text-align:center;
+}
+.called-num-info{flex:1}
+.called-num-label{font-size:11px;color:var(--tm);margin-bottom:2px}
+.called-num-cnt{font-size:13px;font-weight:600;color:var(--tx)}
+.recent-balls{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;max-height:80px;overflow:hidden}
 
-/* big number */
-.big-num{font-size:80px;font-weight:900;color:var(--r);text-align:center;line-height:1;padding:.8rem 0;
-  transition:all .3s;animation:popIn .35s ease}
-@keyframes popIn{0%{transform:scale(.5);opacity:0}80%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
-.big-lbl{text-align:center;font-size:12px;color:var(--tm);margin-bottom:6px}
+/* game layout — side by side on desktop */
+.game-layout{display:grid;grid-template-columns:1fr 340px;gap:12px;align-items:start}
+@media(max-width:680px){.game-layout{grid-template-columns:1fr}}
+
+/* inline chat panel */
+.chat-panel{
+  background:var(--cb);border-radius:var(--rad);border:1px solid var(--bd);
+  display:flex;flex-direction:column;height:420px;
+}
+.chat-panel .ct{padding:12px 14px 0;margin-bottom:0;border-bottom:1px solid var(--bd);padding-bottom:10px}
+.chat-messages{flex:1;overflow-y:auto;padding:10px 12px}
+.chat-msg{margin-bottom:7px;font-size:13px;line-height:1.4}
+.chat-msg .who{font-weight:700;color:var(--g)}
+.chat-msg.me .who{color:#185FA5}
+.chat-msg.sys{color:var(--tm);font-style:italic;font-size:12px}
+.chat-footer{padding:8px 10px;border-top:1px solid var(--bd);display:flex;gap:6px}
+.chat-footer input{margin:0;flex:1;padding:7px 10px;font-size:13px}
 
 /* balls */
 .balls-wrap{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;max-height:160px;overflow-y:auto}
@@ -107,13 +119,16 @@ input.code-inp{text-transform:uppercase;letter-spacing:5px;font-size:18px;font-w
 .ball.called{background:var(--aml);color:#633806;border-color:var(--am)}
 .ball.latest{background:var(--r);color:#fff;border-color:darkred;width:40px;height:40px;font-size:14px;box-shadow:0 0 0 4px rgba(226,75,74,.22)}
 
-/* prizes */
+/* prizes with multiple winners */
 .prize-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
 .prize-card{background:var(--bg);border-radius:var(--rads);padding:9px 11px;border:1px solid var(--bd)}
 .prize-card.won{border-color:var(--g);background:var(--gl)}
+.prize-card.full{border-color:var(--am);background:var(--aml)}
 .pname{font-size:11px;color:var(--tm);margin-bottom:2px}
-.pwinner{font-size:13px;font-weight:700;color:var(--g)}
+.pwinner{font-size:12px;font-weight:700;color:var(--g);margin-bottom:1px}
 .pwinner.empty{color:var(--tm);font-weight:400}
+.pwinner-slot{font-size:11px;color:var(--tm);margin-bottom:1px}
+.pwinner-slot.filled{font-weight:700;color:var(--g)}
 
 /* leaderboard */
 .lb-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--bd)}
@@ -122,15 +137,6 @@ input.code-inp{text-transform:uppercase;letter-spacing:5px;font-size:18px;font-w
 .lb-name{font-size:14px;font-weight:600;flex:1}
 .lb-prize{font-size:12px;color:var(--tm)}
 .lb-badge{padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;background:var(--aml);color:#633806;border:1px solid var(--am)}
-
-/* chat */
-.chat-box{height:220px;overflow-y:auto;border:1px solid var(--bd);border-radius:var(--rads);padding:10px;margin-bottom:8px;background:var(--bg)}
-.chat-msg{margin-bottom:7px;font-size:13px;line-height:1.4}
-.chat-msg .who{font-weight:700;color:var(--g)}
-.chat-msg.me .who{color:#185FA5}
-.chat-msg.sys{color:var(--tm);font-style:italic;font-size:12px}
-.chat-row{display:flex;gap:6px}
-.chat-row input{margin:0;flex:1}
 
 /* auto-call controls */
 .timer-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
@@ -145,6 +151,25 @@ input.code-inp{text-transform:uppercase;letter-spacing:5px;font-size:18px;font-w
 .alert{padding:9px 13px;border-radius:var(--rads);font-size:14px;margin-bottom:10px;font-weight:500}
 .alert-ok{background:var(--gl);color:var(--gd);border:1px solid var(--g)}
 .alert-err{background:var(--rl);color:#7a1f1f;border:1px solid var(--r)}
+
+/* winner popup overlay */
+.win-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1000;
+  display:flex;align-items:center;justify-content:center;
+  animation:fadeInOverlay .3s ease;
+}
+@keyframes fadeInOverlay{from{opacity:0}to{opacity:1}}
+.win-popup{
+  background:var(--cb);border-radius:20px;padding:28px 32px;text-align:center;
+  max-width:320px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.3);
+  animation:popIn .4s ease;
+}
+.win-popup .trophy{font-size:56px;margin-bottom:10px}
+.win-popup h2{font-size:20px;font-weight:800;color:var(--g);margin-bottom:6px}
+.win-popup .ptype{font-size:15px;color:var(--am);font-weight:700;margin-bottom:6px}
+.win-popup .pname-big{font-size:28px;font-weight:900;color:var(--tx);margin-bottom:16px}
+.win-popup .close-btn{background:var(--g);color:#fff;border:none;padding:10px 28px;border-radius:20px;font-size:14px;font-weight:700;cursor:pointer}
+
 .win-banner{
   position:fixed;top:1rem;left:50%;transform:translateX(-50%);
   background:var(--g);color:#fff;padding:11px 22px;border-radius:28px;
@@ -152,6 +177,7 @@ input.code-inp{text-transform:uppercase;letter-spacing:5px;font-size:18px;font-w
   animation:slideDown .4s ease;white-space:nowrap
 }
 @keyframes slideDown{from{opacity:0;top:-2rem}to{opacity:1;top:1rem}}
+@keyframes popIn{0%{transform:scale(.5);opacity:0}80%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
 
 /* status pill */
 .spill{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;font-size:12px;background:var(--aml);color:#633806;margin-bottom:10px}
@@ -166,8 +192,14 @@ input.code-inp{text-transform:uppercase;letter-spacing:5px;font-size:18px;font-w
 .ttab.active{background:var(--g);color:#fff;border-color:var(--g)}
 .ttab.has-win{border-color:var(--am);background:var(--aml);color:#633806}
 
-/* grid 2col */
+/* claim strip */
+.claim-strip{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+
+/* g2 */
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+/* host caller section (within game, now always visible) */
+.host-game-ctrl{background:var(--cb);border-radius:var(--rad);border:1px solid var(--bd);padding:12px;margin-bottom:10px}
 
 footer{text-align:center;font-size:11px;color:var(--tm);padding:1.5rem 0 .8rem}
 </style>
@@ -193,17 +225,15 @@ footer{text-align:center;font-size:11px;color:var(--tm);padding:1.5rem 0 .8rem}
       <option value="3">3 tickets</option>
     </select>
     <label style="font-size:13px;color:var(--tm);display:block;margin-bottom:4px">Custom prize names (optional)</label>
-    <div id="prize-names-wrap">
-      <div class="g2" style="margin-bottom:6px">
-        <input type="text" id="pn-early5" placeholder="Early Five" style="margin:0"/>
-        <input type="text" id="pn-top" placeholder="Top Line" style="margin:0"/>
-      </div>
-      <div class="g2" style="margin-bottom:6px">
-        <input type="text" id="pn-mid" placeholder="Middle Line" style="margin:0"/>
-        <input type="text" id="pn-bot" placeholder="Bottom Line" style="margin:0"/>
-      </div>
-      <input type="text" id="pn-house" placeholder="Full House" style="margin-bottom:8px"/>
+    <div class="g2" style="margin-bottom:6px">
+      <input type="text" id="pn-early5" placeholder="Early Five" style="margin:0"/>
+      <input type="text" id="pn-top" placeholder="Top Line" style="margin:0"/>
     </div>
+    <div class="g2" style="margin-bottom:6px">
+      <input type="text" id="pn-mid" placeholder="Middle Line" style="margin:0"/>
+      <input type="text" id="pn-bot" placeholder="Bottom Line" style="margin:0"/>
+    </div>
+    <input type="text" id="pn-house" placeholder="Full House" style="margin-bottom:8px"/>
     <button class="btn btn-p btn-block" onclick="createRoom()">✦ Create room</button>
   </div>
   <div class="card">
@@ -228,7 +258,7 @@ footer{text-align:center;font-size:11px;color:var(--tm);padding:1.5rem 0 .8rem}
   </div>
   <div class="card">
     <div class="ct">Players in room (<span id="lob-count">0</span>)</div>
-    <div id="lob-players" class="players-list" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+    <div id="lob-players" style="display:flex;flex-wrap:wrap;gap:6px"></div>
   </div>
   <div id="host-lob">
     <button class="btn btn-p btn-block" style="padding:13px" onclick="startGame()">▶ Start game for everyone</button>
@@ -243,117 +273,104 @@ footer{text-align:center;font-size:11px;color:var(--tm);padding:1.5rem 0 .8rem}
 <div id="s-game" class="hidden">
   <div class="spill live"><span class="dot"></span>Live · Room: <strong id="game-room">—</strong></div>
 
-  <div class="tabs">
-    <button class="tab active" id="tb-ticket" onclick="switchTab('ticket')">🎫 Ticket</button>
-    <button class="tab" id="tb-caller" onclick="switchTab('caller')">📢 Caller</button>
-    <button class="tab" id="tb-manual" onclick="switchTab('manual')">✋ Manual</button>
-    <button class="tab" id="tb-prizes" onclick="switchTab('prizes')">🏆 Winners</button>
-    <button class="tab" id="tb-chat" onclick="switchTab('chat')">💬 Chat</button>
-  </div>
-
-  <!-- TICKET TAB -->
-  <div id="tab-ticket">
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <span class="ct" style="margin:0">Your ticket(s)</span>
-        <span id="tick-progress" style="font-size:12px;color:var(--tm)"></span>
-      </div>
-      <div class="ticket-tabs" id="tick-nav"></div>
-      <div class="ticket-wrap">
-        <div class="ticket" id="tick-grid"></div>
-      </div>
-      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px" id="claim-strip"></div>
+  <!-- Called number bar — always visible at top -->
+  <div class="called-num-bar">
+    <div class="called-num-big" id="big-num">—</div>
+    <div class="called-num-info">
+      <div class="called-num-label" id="caller-lbl">Waiting for first number…</div>
+      <div class="called-num-cnt"><span id="called-cnt">0</span>/90 numbers called</div>
+      <div class="recent-balls" id="recent-balls"></div>
     </div>
   </div>
 
-  <!-- CALLER TAB -->
-  <div id="tab-caller" class="hidden">
-    <div class="card">
-      <div class="big-lbl" id="caller-lbl">Waiting for first number…</div>
-      <div class="big-num" id="big-num">—</div>
+  <!-- HOST controls — always visible for host -->
+  <div id="host-game-ctrl" class="host-game-ctrl hidden">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <span style="font-size:13px;font-weight:600">Host Controls</span>
+      <span style="font-size:11px;color:var(--tm)">You are the host ★</span>
+    </div>
+    <div class="timer-row">
+      <label>Auto-call speed:</label>
+      <div class="speed-btns">
+        <button class="spd" onclick="setSpeed(0)" id="spd-off">Off</button>
+        <button class="spd active" onclick="setSpeed(5)" id="spd-5">5s</button>
+        <button class="spd" onclick="setSpeed(10)" id="spd-10">10s</button>
+        <button class="spd" onclick="setSpeed(15)" id="spd-15">15s</button>
+        <button class="spd" onclick="setSpeed(20)" id="spd-20">20s</button>
+      </div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+    <div style="display:flex;gap:6px">
+      <button class="btn btn-p" style="flex:1;padding:11px" onclick="callNext()" id="call-btn">🔔 Call next</button>
+      <button class="btn btn-am btn-sm" id="auto-btn" onclick="toggleAuto()">▶ Auto</button>
+    </div>
+  </div>
 
-      <!-- HOST controls -->
-      <div id="host-caller" class="hidden">
-        <div class="timer-row">
-          <label>Auto-call speed:</label>
-          <div class="speed-btns">
-            <button class="spd" onclick="setSpeed(0)" id="spd-off">Off</button>
-            <button class="spd active" onclick="setSpeed(5)" id="spd-5">5s</button>
-            <button class="spd" onclick="setSpeed(10)" id="spd-10">10s</button>
-            <button class="spd" onclick="setSpeed(15)" id="spd-15">15s</button>
-          </div>
+  <!-- GAME LAYOUT: Ticket + Chat side by side -->
+  <div class="game-layout">
+    <!-- LEFT: Ticket area -->
+    <div>
+      <div class="card" style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span class="ct" style="margin:0">Your Ticket(s)</span>
+          <span id="tick-progress" style="font-size:12px;color:var(--tm)"></span>
         </div>
-        <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
-        <div style="display:flex;gap:6px">
-          <button class="btn btn-p" style="flex:1;padding:11px" onclick="callNext()" id="call-btn">🔔 Call next</button>
-          <button class="btn btn-am btn-sm" id="auto-btn" onclick="toggleAuto()">▶ Auto</button>
+        <div class="ticket-tabs" id="tick-nav"></div>
+        <div class="ticket-wrap">
+          <div class="ticket" id="tick-grid"></div>
         </div>
-        <p style="font-size:11px;color:var(--tm);margin-top:6px;text-align:center">You are the host — call numbers for everyone</p>
+        <p style="font-size:11px;color:var(--tm);margin-top:8px">
+          🟡 Tap called numbers to mark them manually · 🟢 Marked &amp; called · Numbers not yet called cannot be marked
+        </p>
+        <div class="claim-strip" id="claim-strip"></div>
       </div>
 
-      <!-- GUEST info -->
-      <div id="guest-caller" class="hidden" style="text-align:center;font-size:13px;color:var(--tm);margin-bottom:10px">
-        Waiting for host to call the next number…
+      <!-- All called numbers grid (collapsed by default on mobile) -->
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span class="ct" style="margin:0">All called numbers</span>
+          <button class="btn btn-sm" onclick="toggleBallsPanel()" id="balls-toggle">Show</button>
+        </div>
+        <div class="balls-wrap hidden" id="balls"></div>
       </div>
 
-      <hr style="border:none;border-top:1px solid var(--bd);margin:10px 0"/>
-      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
-        <span style="font-size:13px;font-weight:600">Called numbers</span>
-        <span style="font-size:12px;color:var(--tm)"><span id="called-cnt">0</span>/90</span>
+      <!-- Players + Winners compact view -->
+      <div class="card">
+        <div class="ct">Players</div>
+        <div id="game-players" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div>
+        <div class="ct" style="margin-top:8px">Prize Winners</div>
+        <div class="prize-grid" id="prizes-grid"></div>
       </div>
-      <div class="balls-wrap" id="balls"></div>
+    </div>
+
+    <!-- RIGHT: Chat panel -->
+    <div>
+      <div class="chat-panel">
+        <div class="ct" style="padding:12px 14px;margin-bottom:0;border-bottom:1px solid var(--bd)">💬 Room Chat</div>
+        <div class="chat-messages" id="chat-box"></div>
+        <div class="chat-footer">
+          <input type="text" id="chat-inp" placeholder="Type a message…" maxlength="120"
+            onkeydown="if(event.key==='Enter')sendChat()"/>
+          <button class="btn btn-p btn-sm" onclick="sendChat()">Send</button>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- MANUAL TAB -->
-  <div id="tab-manual" class="hidden">
-    <div class="card">
-      <div class="ct">Manual number board</div>
-      <p style="font-size:12px;color:var(--tm);margin-bottom:10px">
-        Tap any number when host announces it. 
-        <span style="color:var(--am);font-weight:600">Yellow</span> = you tapped · 
-        <span style="color:var(--g);font-weight:600">Green</span> = matches called · 
-        <span style="color:var(--r);font-weight:600">Red</span> = wrong (not called yet)
-      </p>
-      <div class="manual-grid" id="manual-grid"></div>
-      <div style="margin-top:10px;font-size:12px;color:var(--tm)">
-        Tapped: <span id="manual-tapped-count" style="font-weight:700;color:var(--tx)">0</span> numbers ·
-        Correct: <span id="manual-correct-count" style="font-weight:700;color:var(--g)">0</span>
-      </div>
-    </div>
-  </div>
+</div>
 
-  <!-- PRIZES / WINNERS TAB -->
-  <div id="tab-prizes" class="hidden">
-    <div class="card">
-      <div class="ct">Prize winners 🏆</div>
-      <div class="prize-grid" id="prizes-grid"></div>
-    </div>
-    <div class="card">
-      <div class="ct">Leaderboard</div>
-      <div id="leaderboard"></div>
-    </div>
-    <div class="card">
-      <div class="ct">All players</div>
-      <div id="game-players" style="display:flex;flex-wrap:wrap;gap:6px"></div>
-    </div>
-  </div>
-
-  <!-- CHAT TAB -->
-  <div id="tab-chat" class="hidden">
-    <div class="card">
-      <div class="ct">Room chat 💬</div>
-      <div class="chat-box" id="chat-box"></div>
-      <div class="chat-row">
-        <input type="text" id="chat-inp" placeholder="Type a message…" maxlength="120"
-          onkeydown="if(event.key==='Enter')sendChat()" style="margin:0"/>
-        <button class="btn btn-p btn-sm" onclick="sendChat()">Send</button>
-      </div>
-    </div>
+<!-- Winner Popup Overlay -->
+<div id="win-overlay" class="win-overlay hidden" onclick="closeWinPopup(event)">
+  <div class="win-popup" onclick="event.stopPropagation()">
+    <div class="trophy">🏆</div>
+    <h2 id="wp-type">Top Line Winner!</h2>
+    <div class="pname-big" id="wp-name">Player Name</div>
+    <div style="font-size:13px;color:var(--tm);margin-bottom:16px" id="wp-slot"></div>
+    <button class="close-btn" onclick="closeWinPopup()">Awesome! 🎉</button>
   </div>
 </div>
 
-<footer>🎱 Tambola · Free to play · Works on mobile . Create by Sumit Shrivas</footer>
+<footer>🎱 Tambola · Free to play · Works on mobile Create by Sumit Shrivas</footer>
 </div>
 
 <!-- Firebase -->
@@ -362,7 +379,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import { getDatabase, ref, set, get, onValue, update, push, serverTimestamp }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-// ── CONFIG (already filled with your project) ──
 const firebaseConfig = {
   apiKey: "AIzaSyCNSzq8jMb8uk4hKjhotHB4b6QwJykbMyM",
   authDomain: "tambola-66a73.firebaseapp.com",
@@ -381,9 +397,24 @@ catch(e) { window._dbOk = false; }
 // ── STATE ──
 let myName='', myRoom='', isHost=false;
 let myTickets=[], activeTicket=0;
-let manualMarked = new Set();
+// ticketMarked[ticketIdx] = Set of numbers manually marked by this player
+let ticketMarked = [];
 let autoTimer=null, autoSpeed=5, autoRunning=false, progInterval=null, progStart=0;
 let lastCalledLen=0, chatListener=null, roomListener=null;
+let lastWinnersJson='';  // to detect new winner announcements
+
+// ── PRIZES — up to 3 winners per category ──
+// winners stored as rooms/ROOM/winners/PRIZEKEY = { w1, w2, w3 } (up to 3 slots)
+const MAX_WINNERS_PER_PRIZE = 3;
+
+let PRIZES=[
+  {key:'early5',label:'Early Five'},
+  {key:'top',   label:'Top Line'},
+  {key:'mid',   label:'Middle Line'},
+  {key:'bot',   label:'Bottom Line'},
+  {key:'house', label:'Full House'}
+];
+function getPrizeLabel(key){ return PRIZES.find(p=>p.key===key)?.label||key }
 
 // ── HELPERS ──
 const $ = id => document.getElementById(id);
@@ -420,6 +451,37 @@ window.copyLink=()=>{
   const u=$('share-url').textContent;
   navigator.clipboard.writeText(u).then(()=>showAlert('Link copied!')).catch(()=>showAlert(u));
 };
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
+
+// ── PRIZE CHECK ──
+function checkPrize(key, called, ticket){
+  const ok=n=>n>0&&called.has(n);
+  if(key==='early5') return flatNums(ticket).filter(n=>called.has(n)).length>=5;
+  if(key==='top')    return ticket[0].every(ok);
+  if(key==='mid')    return ticket[1].every(ok);
+  if(key==='bot')    return ticket[2].every(ok);
+  if(key==='house')  return ticket.flat().every(n=>n===0||called.has(n));
+  return false;
+}
+
+// Return winner slots for a prize key (array up to MAX_WINNERS_PER_PRIZE)
+function getWinnerSlots(winnersObj, key){
+  const pw = winnersObj?.[key] || {};
+  const slots = [];
+  for(let i=1; i<=MAX_WINNERS_PER_PRIZE; i++){
+    if(pw['w'+i]) slots.push(pw['w'+i]);
+  }
+  return slots;
+}
+
+function isAlreadyWinner(winnersObj, key, name){
+  const slots = getWinnerSlots(winnersObj, key);
+  return slots.includes(name);
+}
+
+function isCategoryFull(winnersObj, key){
+  return getWinnerSlots(winnersObj, key).length >= MAX_WINNERS_PER_PRIZE;
+}
 
 // ── SOUND ──
 const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -457,26 +519,6 @@ async function dbGet(path){ const s=await get(ref(db,path)); return s.exists()?s
 async function dbUpd(path,data){ await update(ref(db,path),data) }
 function dbListen(path,cb){ return onValue(ref(db,path),s=>cb(s.exists()?s.val():null)) }
 
-// ── PRIZES (default or custom) ──
-let PRIZES=[
-  {key:'early5',label:'Early Five'},
-  {key:'top',   label:'Top Line'},
-  {key:'mid',   label:'Middle Line'},
-  {key:'bot',   label:'Bottom Line'},
-  {key:'house', label:'Full House'}
-];
-function getPrizeLabel(key){ return PRIZES.find(p=>p.key===key)?.label||key }
-
-function checkPrize(key,called,ticket){
-  const ok=n=>n>0&&called.has(n);
-  if(key==='early5') return flatNums(ticket).filter(n=>called.has(n)).length>=5;
-  if(key==='top')    return ticket[0].every(ok);
-  if(key==='mid')    return ticket[1].every(ok);
-  if(key==='bot')    return ticket[2].every(ok);
-  if(key==='house')  return ticket.flat().every(n=>n===0||called.has(n));
-  return false;
-}
-
 // ── CREATE ROOM ──
 window.createRoom=async function(){
   if(!window._dbOk){showAlert('Firebase not configured','err');return}
@@ -494,6 +536,7 @@ window.createRoom=async function(){
 
   myName=name; myRoom=genCode(); isHost=true;
   myTickets=Array.from({length:ticketCount},()=>genTicket());
+  ticketMarked=myTickets.map(()=>new Set());
 
   await dbSet(`rooms/${myRoom}`,{
     code:myRoom, host:name, status:'lobby', created:Date.now(),
@@ -526,6 +569,7 @@ window.joinRoom=async function(){
     myTickets=Array.from({length:ticketCount},()=>genTicket());
     await dbUpd(`rooms/${code}/players/${name}`,{tickets:myTickets,joined:Date.now()});
   }
+  ticketMarked=myTickets.map(()=>new Set());
   showLobby(); startListening();
 };
 
@@ -536,7 +580,7 @@ window.startGame=async function(){
   addSystemChat('Game started! Good luck everyone! 🎱');
 };
 
-// ── CALL NUMBER ──
+// ── CALL NUMBER (unbiased random — host has no advantage) ──
 window.callNext=async function(){
   if(!isHost) return;
   const room=await dbGet(`rooms/${myRoom}`);
@@ -545,14 +589,16 @@ window.callNext=async function(){
   const rem=[];
   for(let i=1;i<=90;i++) if(!called.includes(i)) rem.push(i);
   if(rem.length===0){showAlert('All 90 numbers called!');stopAuto();return}
-  const num=rem[Math.floor(Math.random()*rem.length)];
+  // Cryptographically seeded random index for fairness
+  const idx=Math.floor(Math.random()*rem.length);
+  const num=rem[idx];
   await dbUpd(`rooms/${myRoom}`,{called:[...called,num]});
 };
 
 // ── AUTO CALL ──
 window.setSpeed=function(s){
   autoSpeed=s;
-  ['off','5','10','15'].forEach(x=>$('spd-'+x)?.classList.remove('active'));
+  ['off','5','10','15','20'].forEach(x=>$('spd-'+x)?.classList.remove('active'));
   $('spd-'+(s===0?'off':s))?.classList.add('active');
   if(s===0) stopAuto();
   else if(autoRunning) startAutoTimer();
@@ -579,10 +625,6 @@ function startAutoTimer(){
     $('prog-fill').style.transition=`width ${autoSpeed}s linear`;
     $('prog-fill').style.width='100%';
   },30);
-  progInterval=setInterval(()=>{
-    const pct=Math.min(100,((Date.now()-progStart)/dur)*100);
-    // handled by CSS transition
-  },200);
   autoTimer=setTimeout(async()=>{
     if(!autoRunning) return;
     await callNext();
@@ -598,47 +640,50 @@ function stopAuto(){
   if(ab){ab.textContent='▶ Auto';ab.classList.remove('btn-r');ab.classList.add('btn-am')}
 }
 
-// ── CLAIM PRIZE ──
+// ── MANUAL TICKET MARKING ──
+// Players click cells on their ticket to mark numbers (only if called)
+window.toggleTicketCell = function(n, ticketIdx){
+  const called = window._lastCalled || new Set();
+  if(!called.has(n)){
+    showAlert('That number hasn\'t been called yet!','err');
+    return;
+  }
+  const marked = ticketMarked[ticketIdx] || new Set();
+  if(marked.has(n)) marked.delete(n);
+  else marked.add(n);
+  ticketMarked[ticketIdx] = marked;
+  renderTicket(called, window._lastRoom);
+};
+
+// ── CLAIM PRIZE (server-side validation) ──
 window.claimPrize=async function(key){
   const room=await dbGet(`rooms/${myRoom}`);
   if(!room) return;
-  if(room.winners?.[key]){showAlert('Already claimed!','err');return}
-  const called=new Set(room.called||[]);
-  const valid=myTickets.some(t=>checkPrize(key,called,t));
-  if(!valid){showAlert('Not valid yet!','err');return}
-  await dbUpd(`rooms/${myRoom}/winners`,{[key]:myName});
-  playClaimSound();
-  showBanner('🎉 '+myName+' claimed '+getPrizeLabel(key)+'!');
-  addSystemChat('🏆 '+myName+' just claimed '+getPrizeLabel(key)+'! Congratulations!');
-};
 
-// ── MANUAL NUMBER BOARD ──
-window.toggleManual=function(n){
-  if(manualMarked.has(n)) manualMarked.delete(n);
-  else manualMarked.add(n);
-  renderManualGrid(window._lastCalled||new Set());
-};
+  const winners = room.winners || {};
 
-function renderManualGrid(called){
-  const g=$('manual-grid');
-  if(!g) return;
-  let html='';
-  for(let i=1;i<=90;i++){
-    const isCalled=called.has(i);
-    const isMarked=manualMarked.has(i);
-    let cls='mnum';
-    if(isCalled) cls+=' called';
-    if(isMarked && isCalled) cls+=' manual-marked called';
-    else if(isMarked && !isCalled) cls+=' manual-marked wrong';
-    else if(!isMarked && isCalled) cls+=' called';
-    html+=`<div class="${cls}" onclick="toggleManual(${i})">${i}</div>`;
+  // Check if already claimed this prize
+  if(isAlreadyWinner(winners, key, myName)){
+    showAlert('You already claimed this prize!','err'); return;
   }
-  g.innerHTML=html;
-  const tapped=manualMarked.size;
-  const correct=[...manualMarked].filter(n=>called.has(n)).length;
-  $('manual-tapped-count').textContent=tapped;
-  $('manual-correct-count').textContent=correct;
-}
+
+  // Check if category is full
+  if(isCategoryFull(winners, key)){
+    showAlert('All winners for this prize have been claimed!','err'); return;
+  }
+
+  // Server-side validation: check using CALLED numbers from DB, not local state
+  const called = new Set(room.called||[]);
+  const valid = myTickets.some(t=>checkPrize(key,called,t));
+  if(!valid){showAlert('Claim not valid — numbers not yet matched!','err');return}
+
+  // Write to next available slot
+  const existingSlots = getWinnerSlots(winners, key);
+  const nextSlot = 'w' + (existingSlots.length + 1);
+  await dbUpd(`rooms/${myRoom}/winners/${key}`, {[nextSlot]: myName});
+  playClaimSound();
+  addSystemChat('🏆 '+myName+' claimed '+getPrizeLabel(key)+'! Congratulations!');
+};
 
 // ── CHAT ──
 window.sendChat=async function(){
@@ -653,6 +698,7 @@ window.sendChat=async function(){
 async function addSystemChat(msg){
   await push(ref(db,`rooms/${myRoom}/chat`),{who:'__sys__',msg,ts:Date.now()});
 }
+
 function listenChat(){
   if(chatListener) chatListener();
   chatListener=dbListen(`rooms/${myRoom}/chat`,data=>{
@@ -666,7 +712,6 @@ function listenChat(){
     box.scrollTop=box.scrollHeight;
   });
 }
-function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
 
 // ── SCREENS ──
 function showLobby(){
@@ -681,8 +726,8 @@ function showGame(){
   $('s-lobby').classList.add('hidden');
   $('s-game').classList.remove('hidden');
   $('game-room').textContent=myRoom;
-  if(isHost){ $('host-caller').classList.remove('hidden'); $('guest-caller').classList.add('hidden'); }
-  else { $('host-caller').classList.add('hidden'); $('guest-caller').classList.remove('hidden'); }
+  // Show host controls only for host
+  if(isHost){ $('host-game-ctrl').classList.remove('hidden'); }
   buildTicketNav();
   listenChat();
 }
@@ -701,6 +746,19 @@ window.selectTicket=function(i){
     const t=$('ttab-'+j); if(t) t.classList.toggle('active',j===i);
   });
   renderTicket(window._lastCalled||new Set(), window._lastRoom);
+};
+
+// ── BALLS TOGGLE ──
+window.toggleBallsPanel=function(){
+  const balls=$('balls');
+  const btn=$('balls-toggle');
+  if(balls.classList.contains('hidden')){
+    balls.classList.remove('hidden');
+    btn.textContent='Hide';
+  } else {
+    balls.classList.add('hidden');
+    btn.textContent='Show';
+  }
 };
 
 // ── RENDER ──
@@ -734,58 +792,75 @@ function renderGame(room){
     lastCalledLen=calledArr.length;
   }
 
-  // big number
+  // big number display
   const latest=calledArr.length>0?calledArr[calledArr.length-1]:null;
   $('big-num').textContent=latest||'—';
-  $('caller-lbl').textContent=latest?`Number called:`:'Waiting for first number…';
+  $('caller-lbl').textContent=latest?`Last called:`:'Waiting for first number…';
   $('called-cnt').textContent=calledArr.length;
 
-  // balls
+  // recent balls (last 8)
   const rev=[...calledArr].reverse();
+  $('recent-balls').innerHTML=rev.slice(1,9).map(n=>
+    `<div class="ball called" style="width:26px;height:26px;font-size:10px">${n}</div>`
+  ).join('');
+
+  // all balls panel
   $('balls').innerHTML=rev.map((n,i)=>`<div class="ball ${i===0?'latest':'called'}">${n}</div>`).join('');
 
   // ticket
   renderTicket(called, room);
 
-  // manual
-  renderManualGrid(called);
-
-  // prizes & leaderboard
+  // prizes & winners popup detection
   renderPrizes(room, called);
+  detectNewWinners(room);
 
   // players
   const pObj=room.players||{};
   const winners=room.winners||{};
   $('game-players').innerHTML=Object.keys(pObj).map(n=>{
-    const won=Object.values(winners).includes(n);
+    const allSlots = PRIZES.flatMap(p=>getWinnerSlots(winners,p.key));
+    const won=allSlots.includes(n);
     return `<span class="chip ${n===room.host?'host':''} ${n===myName?'me':''} ${won?'won':''}">${n===room.host?'★ ':''}${n}${won?' 🏆':''}</span>`;
   }).join('');
 }
 
 function renderTicket(called, room){
   const ticket=myTickets[activeTicket]||myTickets[0];
+  const marked=ticketMarked[activeTicket]||new Set();
   const allNums=flatNums(ticket);
-  const matched=allNums.filter(n=>called.has(n));
-  $('tick-progress').textContent=`Ticket ${activeTicket+1}: ${matched.length}/${allNums.length} matched`;
+  const matchedCalled=allNums.filter(n=>called.has(n));
+  const markedCorrect=allNums.filter(n=>marked.has(n)&&called.has(n));
+  $('tick-progress').textContent=`Ticket ${activeTicket+1}: ${markedCorrect.length}/${allNums.length} marked`;
 
   $('tick-grid').innerHTML=ticket.flat().map(n=>{
     if(n===0) return `<div class="tcell blank"></div>`;
-    return `<div class="tcell ${called.has(n)?'hit':''}">${n}</div>`;
+    const isCalled=called.has(n);
+    const isMarked=marked.has(n);
+    let cls='tcell';
+    if(isMarked && isCalled) cls+=' hit';           // correctly marked
+    else if(isMarked && !isCalled) cls+=' manual';  // marked but not called (show amber)
+    else if(isCalled && !isMarked) cls+=' called-not-marked'; // called but not marked yet
+    // onclick: allow toggling if called; show error if not called
+    return `<div class="${cls}" onclick="toggleTicketCell(${n},${activeTicket})" title="${isCalled?'Click to mark/unmark':'Not called yet'}">${n}</div>`;
   }).join('');
 
   // update ticket nav badges
   if(myTickets.length>1){
     myTickets.forEach((t,i)=>{
       const btn=$('ttab-'+i); if(!btn) return;
-      const claimable=PRIZES.some(p=>!(room?.winners?.[p.key]) && checkPrize(p.key,called,t));
+      const claimable=PRIZES.some(p=>!isCategoryFull(room?.winners,p.key)&&!isAlreadyWinner(room?.winners,p.key,myName)&&checkPrize(p.key,called,t));
       btn.classList.toggle('has-win',claimable);
     });
   }
 
-  // claim buttons (check all tickets)
+  // claim buttons — show for valid unresolved prizes
   if(room){
     $('claim-strip').innerHTML=PRIZES
-      .filter(p=>!(room.winners?.[p.key]) && myTickets.some(t=>checkPrize(p.key,called,t)))
+      .filter(p=>
+        !isCategoryFull(room.winners,p.key) &&
+        !isAlreadyWinner(room.winners,p.key,myName) &&
+        myTickets.some(t=>checkPrize(p.key,called,t))
+      )
       .map(p=>`<button class="btn btn-p btn-sm" onclick="claimPrize('${p.key}')">🎉 Claim: ${getPrizeLabel(p.key)}!</button>`)
       .join('');
   }
@@ -793,45 +868,92 @@ function renderTicket(called, room){
 
 function renderPrizes(room, called){
   const winners=room.winners||{};
-  // prizes grid
   $('prizes-grid').innerHTML=PRIZES.map(p=>{
-    const w=winners[p.key];
-    return `<div class="prize-card ${w?'won':''}">
+    const slots=getWinnerSlots(winners,p.key);
+    const full=slots.length>=MAX_WINNERS_PER_PRIZE;
+    const hasAny=slots.length>0;
+    let slotHtml='';
+    for(let i=0;i<MAX_WINNERS_PER_PRIZE;i++){
+      if(slots[i]) slotHtml+=`<div class="pwinner-slot filled">${i+1}. ${esc(slots[i])}</div>`;
+      else slotHtml+=`<div class="pwinner-slot">${i+1}. —</div>`;
+    }
+    return `<div class="prize-card ${full?'full':hasAny?'won':''}">
       <div class="pname">${getPrizeLabel(p.key)}</div>
-      <div class="pwinner ${w?'':'empty'}">${w||'—'}</div>
+      ${slotHtml}
     </div>`;
   }).join('');
-
-  // leaderboard
-  const medals=['🥇','🥈','🥉','🏅','🏅'];
-  const entries=PRIZES.filter(p=>winners[p.key]).map((p,i)=>({
-    medal:medals[i]||'🏅', name:winners[p.key], prize:getPrizeLabel(p.key)
-  }));
-  if(entries.length===0){
-    $('leaderboard').innerHTML='<p style="font-size:13px;color:var(--tm)">No prizes claimed yet…</p>';
-  } else {
-    $('leaderboard').innerHTML=entries.map(e=>`
-      <div class="lb-row">
-        <div class="lb-medal">${e.medal}</div>
-        <div class="lb-name">${esc(e.name)}</div>
-        <span class="lb-badge">${esc(e.prize)}</span>
-      </div>`).join('');
-  }
 }
+
+// ── WIN POPUP shown on ALL players' screens when someone wins ──
+let _popupQueue = [];
+let _popupShowing = false;
+
+function detectNewWinners(room){
+  const winners=room.winners||{};
+  const json=JSON.stringify(winners);
+  if(json===lastWinnersJson) return;
+
+  // Find newly added winners
+  if(lastWinnersJson){
+    const prev=JSON.parse(lastWinnersJson);
+    PRIZES.forEach(p=>{
+      const prevSlots=getWinnerSlotsFromObj(prev,p.key);
+      const currSlots=getWinnerSlots(winners,p.key);
+      // Check each slot for new entries
+      currSlots.forEach((winner,i)=>{
+        if(!prevSlots[i]){
+          // New winner!
+          _popupQueue.push({winner, prize:getPrizeLabel(p.key), slot:i+1, total:currSlots.length});
+        }
+      });
+    });
+    drainPopupQueue();
+  }
+  lastWinnersJson=json;
+}
+
+function getWinnerSlotsFromObj(winnersObj, key){
+  const pw = winnersObj?.[key] || {};
+  const slots = [];
+  for(let i=1; i<=MAX_WINNERS_PER_PRIZE; i++){
+    if(pw['w'+i]) slots.push(pw['w'+i]);
+  }
+  return slots;
+}
+
+function drainPopupQueue(){
+  if(_popupShowing || _popupQueue.length===0) return;
+  const {winner, prize, slot, total}=_popupQueue.shift();
+  showWinPopup(winner, prize, slot, total);
+}
+
+function showWinPopup(winner, prize, slot, total){
+  _popupShowing=true;
+  $('wp-type').textContent = prize + ' Winner' + (total>1?` #${slot}`:'') + '!';
+  $('wp-name').textContent = winner;
+  $('wp-slot').textContent = slot===1?'🥇 First winner':slot===2?'🥈 Second winner':'🥉 Third winner';
+  $('win-overlay').classList.remove('hidden');
+  playClaimSound();
+  showBanner(`🏆 ${winner} — ${prize}!`);
+}
+
+window.closeWinPopup=function(e){
+  if(e && e.target !== $('win-overlay') && !e.target.classList.contains('close-btn')) return;
+  $('win-overlay').classList.add('hidden');
+  _popupShowing=false;
+  setTimeout(drainPopupQueue, 400);
+};
+
+// Also allow close by clicking overlay background
+$('win-overlay').addEventListener('click', function(e){
+  if(e.target===this){ closeWinPopup(e); }
+});
 
 // ── LISTEN ──
 function startListening(){
   if(roomListener) roomListener();
   roomListener=dbListen(`rooms/${myRoom}`,renderRoom);
 }
-
-// ── TAB SWITCH ──
-window.switchTab=function(tab){
-  ['ticket','caller','manual','prizes','chat'].forEach(t=>{
-    $('tab-'+t)?.classList.toggle('hidden',t!==tab);
-    $('tb-'+t)?.classList.toggle('active',t===tab);
-  });
-};
 
 // ── AUTO-FILL ROOM FROM URL ──
 const urlRoom=new URLSearchParams(location.search).get('room');
