@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tambola / Housie — Play with Friends</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green: #1D9E75;
+      --green-light: #E1F5EE;
+      --green-dark: #0F6E56;
+      --red: #E24B4A;
+      --red-light: #FCEBEB;
+      --amber: #EF9F27;
+      --amber-light: #FAEEDA;
+      --gray-bg: #F5F5F3;
+      --gray-border: rgba(0,0,0,0.12);
+      --text: #1a1a1a;
+      --text-muted: #666;
+      --card-bg: #fff;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --gray-bg: #1e1e1e;
+        --gray-border: rgba(255,255,255,0.12);
+        --text: #f0f0f0;
+        --text-muted: #999;
+        --card-bg: #2a2a2a;
+      }
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--gray-bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .app { max-width: 600px; margin: 0 auto; padding: 1rem; }
+
+    header {
+      text-align: center;
+      padding: 1.5rem 1rem 1rem;
+    }
+    header h1 { font-size: 26px; font-weight: 700; color: var(--green); }
+    header p { font-size: 14px; color: var(--text-muted); margin-top: 4px; }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      border: 1px solid var(--gray-border);
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+
+    input[type=text] {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--gray-border);
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      background: var(--gray-bg);
+      color: var(--text);
+      margin-bottom: 10px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input[type=text]:focus { border-color: var(--green); }
+    input.code-input {
+      text-transform: uppercase;
+      letter-spacing: 6px;
+      font-size: 20px;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 10px 20px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--gray-border);
+      background: var(--card-bg);
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      gap: 6px;
+    }
+    .btn:hover { background: var(--gray-bg); }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: var(--green); color: #fff; border-color: var(--green); }
+    .btn-primary:hover { background: var(--green-dark); border-color: var(--green-dark); }
+    .btn-block { width: 100%; margin-bottom: 8px; }
+    .btn-danger { background: var(--red); color: #fff; border-color: var(--red); }
+    .btn-sm { padding: 6px 14px; font-size: 13px; }
+
+    .hidden { display: none !important; }
+
+    /* Room code display */
+    .room-code-display {
+      font-size: 36px;
+      font-weight: 700;
+      letter-spacing: 8px;
+      color: var(--green);
+      background: var(--green-light);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      text-align: center;
+      margin: 8px 0;
+    }
+
+    /* Players */
+    .players-list { display: flex; flex-wrap: wrap; gap: 8px; }
+    .player-chip {
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      background: var(--gray-bg);
+      border: 1px solid var(--gray-border);
+    }
+    .player-chip.host {
+      background: var(--green-light);
+      border-color: var(--green);
+      color: var(--green-dark);
+      font-weight: 600;
+    }
+    .player-chip.me { font-weight: 600; }
+
+    /* Tambola Ticket */
+    .ticket-wrap { overflow-x: auto; }
+    .ticket {
+      display: grid;
+      grid-template-columns: repeat(9, 1fr);
+      gap: 4px;
+      min-width: 280px;
+    }
+    .tcell {
+      aspect-ratio: 1;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 6px;
+      border: 1px solid var(--gray-border);
+      background: var(--gray-bg);
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .tcell.blank { background: transparent; border-color: transparent; }
+    .tcell.hit {
+      background: var(--green);
+      color: #fff;
+      border-color: var(--green-dark);
+      transform: scale(1.05);
+    }
+
+    /* Number ball */
+    .balls-wrap { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .ball {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 600;
+      background: var(--gray-bg);
+      border: 1px solid var(--gray-border);
+      color: var(--text-muted);
+      transition: all 0.3s;
+    }
+    .ball.called { background: var(--amber-light); color: #633806; border-color: var(--amber); }
+    .ball.latest {
+      background: var(--red);
+      color: #fff;
+      border-color: darkred;
+      width: 42px; height: 42px;
+      font-size: 15px;
+      box-shadow: 0 0 0 4px rgba(226,75,74,0.25);
+    }
+
+    /* Big current number */
+    .big-number {
+      font-size: 72px;
+      font-weight: 800;
+      color: var(--red);
+      text-align: center;
+      line-height: 1;
+      padding: 1rem 0;
+    }
+    .big-label { text-align: center; font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
+
+    /* Prizes */
+    .prizes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .prize-item {
+      background: var(--gray-bg);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+    }
+    .prize-name { font-size: 12px; color: var(--text-muted); }
+    .prize-winner { font-size: 14px; font-weight: 600; color: var(--green); margin-top: 2px; }
+    .prize-winner.empty { color: var(--text-muted); font-weight: 400; }
+
+    /* Tabs */
+    .tabs { display: flex; gap: 4px; background: var(--gray-bg); border-radius: var(--radius-sm); padding: 4px; margin-bottom: 1rem; }
+    .tab {
+      flex: 1; padding: 8px; border-radius: 6px; border: none;
+      background: transparent; color: var(--text-muted);
+      font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s;
+    }
+    .tab.active { background: var(--card-bg); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+    /* Alert */
+    .alert {
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      margin-bottom: 12px;
+      font-weight: 500;
+    }
+    .alert-success { background: var(--green-light); color: var(--green-dark); border: 1px solid var(--green); }
+    .alert-error { background: var(--red-light); color: #7a1f1f; border: 1px solid var(--red); }
+
+    /* Status */
+    .status-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 12px; border-radius: 20px;
+      font-size: 13px; background: var(--amber-light); color: #633806;
+      margin-bottom: 12px;
+    }
+    .status-pill.live { background: var(--green-light); color: var(--green-dark); }
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+    .dot.pulse { animation: pulse 1.2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    /* Claim strip */
+    .claim-strip { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+
+    /* Divider */
+    .divider { border: none; border-top: 1px solid var(--gray-border); margin: 12px 0; }
+
+    /* Share section */
+    .share-box { background: var(--green-light); border-radius: var(--radius-sm); padding: 12px; text-align: center; }
+    .share-url { font-size: 12px; color: var(--text-muted); word-break: break-all; margin-top: 6px; }
+
+    /* Loading */
+    .spinner {
+      display: inline-block; width: 18px; height: 18px;
+      border: 2px solid var(--gray-border);
+      border-top-color: var(--green);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Win popup */
+    .win-banner {
+      position: fixed; top: 1rem; left: 50%; transform: translateX(-50%);
+      background: var(--green); color: #fff;
+      padding: 12px 24px; border-radius: 30px;
+      font-size: 15px; font-weight: 700;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      z-index: 999;
+      animation: slideDown 0.4s ease;
+    }
+    @keyframes slideDown { from{opacity:0;top:-2rem} to{opacity:1;top:1rem} }
+
+    footer { text-align: center; font-size: 12px; color: var(--text-muted); padding: 2rem 0 1rem; }
+  </style>
+</head>
+<body>
+
+<div class="app">
+  <header>
+    <h1>🎱 Tambola</h1>
+    <p>Play Housie with friends online — free &amp; instant</p>
+  </header>
+
+  <div id="alert-box" class="hidden"></div>
+
+  <!-- ══════════ SCREEN: HOME ══════════ -->
+  <div id="screen-home">
+    <div class="card">
+      <div class="card-title">Create a new room</div>
+      <input type="text" id="host-name" placeholder="Your name" maxlength="20" />
+      <button class="btn btn-primary btn-block" onclick="createRoom()">
+        ✦ Create room &amp; get code
+      </button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Join a room</div>
+      <input type="text" id="join-name" placeholder="Your name" maxlength="20" />
+      <input type="text" id="join-code" class="code-input" placeholder="ROOM CODE" maxlength="6"
+        oninput="this.value=this.value.toUpperCase()" />
+      <button class="btn btn-primary btn-block" onclick="joinRoom()">
+        → Join room
+      </button>
+    </div>
+
+    <div class="card" style="text-align:center;padding:1rem;">
+      <p style="font-size:13px;color:var(--text-muted);">
+        🔒 No login needed · Works on mobile · Up to 20 players
+      </p>
+    </div>
+  </div>
+
+  <!-- ══════════ SCREEN: LOBBY ══════════ -->
+  <div id="screen-lobby" class="hidden">
+    <div id="lobby-status-pill" class="status-pill">
+      <span class="dot pulse"></span> Waiting for players…
+    </div>
+
+    <div class="card">
+      <div class="card-title">Share this code with friends</div>
+      <div class="room-code-display" id="display-code">——</div>
+      <div class="share-box">
+        <p style="font-size:13px;font-weight:600;color:var(--green-dark);">Share this link:</p>
+        <p class="share-url" id="share-url">—</p>
+        <button class="btn btn-sm" style="margin-top:8px;" onclick="copyLink()">📋 Copy link</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Players (<span id="lobby-player-count">0</span>)</div>
+      <div class="players-list" id="lobby-players"></div>
+    </div>
+
+    <div id="host-lobby-btn">
+      <button class="btn btn-primary btn-block" style="padding:14px;" onclick="startGame()">
+        ▶ Start game for everyone
+      </button>
+      <p style="text-align:center;font-size:12px;color:var(--text-muted);margin-top:6px;">
+        Only you (the host) can start the game
+      </p>
+    </div>
+    <div id="guest-lobby-msg" class="hidden" style="text-align:center;padding:12px;font-size:14px;color:var(--text-muted);">
+      Waiting for host to start the game…
+    </div>
+  </div>
+
+  <!-- ══════════ SCREEN: GAME ══════════ -->
+  <div id="screen-game" class="hidden">
+    <div id="game-status-pill" class="status-pill live">
+      <span class="dot"></span> Game live · Room: <strong id="game-room-label">—</strong>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" id="tab-btn-ticket" onclick="switchTab('ticket')">🎫 My Ticket</button>
+      <button class="tab" id="tab-btn-caller" onclick="switchTab('caller')">📢 Caller</button>
+      <button class="tab" id="tab-btn-prizes" onclick="switchTab('prizes')">🏆 Prizes</button>
+    </div>
+
+    <!-- Ticket tab -->
+    <div id="tab-ticket">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <span class="card-title" style="margin:0;">Your ticket</span>
+          <span id="ticket-progress" style="font-size:13px;color:var(--text-muted);">0/15</span>
+        </div>
+        <div class="ticket-wrap">
+          <div class="ticket" id="ticket-grid"></div>
+        </div>
+        <div class="claim-strip" id="claim-strip"></div>
+      </div>
+    </div>
+
+    <!-- Caller tab -->
+    <div id="tab-caller" class="hidden">
+      <div class="card">
+        <div class="big-label" id="caller-label">Last called number</div>
+        <div class="big-number" id="big-number">—</div>
+
+        <div id="host-call-controls" class="hidden" style="text-align:center;margin-bottom:1rem;">
+          <button class="btn btn-primary" style="padding:12px 36px;font-size:16px;" onclick="callNext()" id="call-btn">
+            🔔 Call next number
+          </button>
+          <p style="font-size:12px;color:var(--text-muted);margin-top:6px;">You are the host — tap to call numbers for everyone</p>
+        </div>
+        <div id="guest-call-info" class="hidden" style="text-align:center;margin-bottom:1rem;font-size:13px;color:var(--text-muted);">
+          Waiting for host to call the next number…
+        </div>
+
+        <hr class="divider" />
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+          <span style="font-size:13px;font-weight:600;">Called numbers</span>
+          <span style="font-size:13px;color:var(--text-muted);"><span id="called-count">0</span>/90</span>
+        </div>
+        <div class="balls-wrap" id="balls-wrap"></div>
+      </div>
+    </div>
+
+    <!-- Prizes tab -->
+    <div id="tab-prizes" class="hidden">
+      <div class="card">
+        <div class="card-title">Prize winners</div>
+        <div class="prizes-grid" id="prizes-grid"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Players</div>
+        <div class="players-list" id="game-players"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>Made with ♥ · Works on GitHub Pages</footer>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, get, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+// ─────────────────────────────────────────────
+// 🔧 CONFIGURATION — Replace with your own Firebase project
+//    Steps:
+//    1. Go to https://console.firebase.google.com
+//    2. Create a new project (free)
+//    3. Add a Web App → copy the firebaseConfig below
+//    4. Go to Realtime Database → Create database (test mode)
+//    5. Paste your config here and push to GitHub!
+// ─────────────────────────────────────────────
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+  projectId: "YOUR_PROJECT",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+// ─── Init ────────────────────────────────────
+let app, db;
+try {
+  app = initializeApp(firebaseConfig);
+  db = getDatabase(app);
+  window._dbReady = true;
+} catch(e) {
+  window._dbReady = false;
+  console.warn("Firebase not configured:", e.message);
+}
+
+// ─── State ───────────────────────────────────
+window.myName = "";
+window.myRoom = "";
+window.isHost = false;
+window.myTicket = [];
+window.gameListener = null;
+
+// ─── Helpers ─────────────────────────────────
+function genCode() {
+  return Math.random().toString(36).substring(2, 8).toUpperCase();
+}
+
+function genTicket() {
+  const ticket = [];
+  for (let row = 0; row < 3; row++) {
+    const rowData = new Array(9).fill(0);
+    const cols = [...Array(9).keys()].sort(() => Math.random() - 0.5).slice(0, 5).sort((a,b)=>a-b);
+    cols.forEach(col => {
+      const lo = col === 0 ? 1 : col * 10;
+      const hi = col === 8 ? 90 : col * 10 + 9;
+      rowData[col] = Math.floor(Math.random() * (hi - lo + 1)) + lo;
+    });
+    ticket.push(rowData);
+  }
+  return ticket;
+}
+
+function flatNums(ticket) {
+  return ticket.flat().filter(n => n > 0);
+}
+
+function showAlert(msg, type = "success") {
+  const box = document.getElementById("alert-box");
+  box.className = "alert alert-" + type;
+  box.textContent = msg;
+  box.classList.remove("hidden");
+  setTimeout(() => box.classList.add("hidden"), 4000);
+}
+
+function showBanner(msg) {
+  const b = document.createElement("div");
+  b.className = "win-banner";
+  b.textContent = msg;
+  document.body.appendChild(b);
+  setTimeout(() => b.remove(), 4000);
+}
+
+window.copyLink = function() {
+  const url = document.getElementById("share-url").textContent;
+  navigator.clipboard.writeText(url).then(() => showAlert("Link copied!")).catch(() => showAlert("Copy: " + url));
+};
+
+// ─── DB helpers ──────────────────────────────
+async function dbSet(path, data) {
+  if (!window._dbReady) { useFallback(); return; }
+  await set(ref(db, path), data);
+}
+
+async function dbGet(path) {
+  if (!window._dbReady) return null;
+  const snap = await get(ref(db, path));
+  return snap.exists() ? snap.val() : null;
+}
+
+async function dbUpdate(path, data) {
+  if (!window._dbReady) { useFallback(); return; }
+  await update(ref(db, path), data);
+}
+
+function dbListen(path, cb) {
+  if (!window._dbReady) return () => {};
+  const unsubscribe = onValue(ref(db, path), snap => {
+    cb(snap.exists() ? snap.val() : null);
+  });
+  return unsubscribe;
+}
+
+function useFallback() {
+  showAlert("⚠️ Firebase not configured yet! See README.md for setup steps.", "error");
+}
+
+// ─── Create Room ─────────────────────────────
+window.createRoom = async function() {
+  if (!window._dbReady) { useFallback(); return; }
+  const name = document.getElementById("host-name").value.trim();
+  if (!name) { showAlert("Please enter your name", "error"); return; }
+
+  window.myName = name;
+  window.myRoom = genCode();
+  window.isHost = true;
+  window.myTicket = genTicket();
+
+  const roomData = {
+    code: window.myRoom,
+    host: name,
+    status: "lobby",
+    created: Date.now(),
+    players: { [name]: { ticket: window.myTicket, joined: Date.now() } },
+    called: [],
+    winners: {}
+  };
+
+  await dbSet(`rooms/${window.myRoom}`, roomData);
+  showLobby();
+  startListening();
+};
+
+// ─── Join Room ───────────────────────────────
+window.joinRoom = async function() {
+  if (!window._dbReady) { useFallback(); return; }
+  const name = document.getElementById("join-name").value.trim();
+  const code = document.getElementById("join-code").value.trim().toUpperCase();
+  if (!name) { showAlert("Enter your name", "error"); return; }
+  if (code.length < 4) { showAlert("Enter the room code", "error"); return; }
+
+  const room = await dbGet(`rooms/${code}`);
+  if (!room) { showAlert("Room not found! Check the code.", "error"); return; }
+  if (room.status === "playing") { showAlert("Game already started!", "error"); return; }
+
+  window.myName = name;
+  window.myRoom = code;
+  window.isHost = false;
+
+  if (room.players && room.players[name]) {
+    window.myTicket = room.players[name].ticket;
+  } else {
+    window.myTicket = genTicket();
+    await dbUpdate(`rooms/${code}/players/${name}`, { ticket: window.myTicket, joined: Date.now() });
+  }
+
+  showLobby();
+  startListening();
+};
+
+// ─── Start Game ──────────────────────────────
+window.startGame = async function() {
+  if (!window.isHost) return;
+  await dbUpdate(`rooms/${window.myRoom}`, { status: "playing", startedAt: Date.now() });
+};
+
+// ─── Call Number ─────────────────────────────
+window.callNext = async function() {
+  if (!window.isHost) return;
+  const room = await dbGet(`rooms/${window.myRoom}`);
+  if (!room) return;
+  const called = room.called || [];
+  const remaining = [];
+  for (let i = 1; i <= 90; i++) if (!called.includes(i)) remaining.push(i);
+  if (remaining.length === 0) { showAlert("All 90 numbers called!"); return; }
+  const num = remaining[Math.floor(Math.random() * remaining.length)];
+  await dbUpdate(`rooms/${window.myRoom}`, { called: [...called, num] });
+};
+
+// ─── Claim Prize ─────────────────────────────
+window.claimPrize = async function(key) {
+  const room = await dbGet(`rooms/${window.myRoom}`);
+  if (!room) return;
+  if (room.winners && room.winners[key]) { showAlert("Already claimed!", "error"); return; }
+  const called = new Set(room.called || []);
+  if (!checkPrize(key, called, window.myTicket)) { showAlert("Not valid yet!", "error"); return; }
+  await dbUpdate(`rooms/${window.myRoom}/winners`, { [key]: window.myName });
+  showBanner("🎉 " + window.myName + " claimed " + PRIZES.find(p => p.key===key).label + "!");
+};
+
+// ─── Prizes ──────────────────────────────────
+const PRIZES = [
+  { key: "early5", label: "Early Five" },
+  { key: "top",    label: "Top line" },
+  { key: "mid",    label: "Middle line" },
+  { key: "bot",    label: "Bottom line" },
+  { key: "house",  label: "Full house" }
+];
+
+function checkPrize(key, called, ticket) {
+  const ok = n => n > 0 && called.has(n);
+  if (key === "early5") return flatNums(ticket).filter(n => called.has(n)).length >= 5;
+  if (key === "top")    return ticket[0].every(ok);
+  if (key === "mid")    return ticket[1].every(ok);
+  if (key === "bot")    return ticket[2].every(ok);
+  if (key === "house")  return ticket.flat().every(n => n === 0 || called.has(n));
+  return false;
+}
+
+// ─── Screens ─────────────────────────────────
+function showLobby() {
+  document.getElementById("screen-home").classList.add("hidden");
+  document.getElementById("screen-lobby").classList.remove("hidden");
+  document.getElementById("display-code").textContent = window.myRoom;
+
+  const url = `${location.origin}${location.pathname}?room=${window.myRoom}`;
+  document.getElementById("share-url").textContent = url;
+
+  if (window.isHost) {
+    document.getElementById("host-lobby-btn").classList.remove("hidden");
+    document.getElementById("guest-lobby-msg").classList.add("hidden");
+  } else {
+    document.getElementById("host-lobby-btn").classList.add("hidden");
+    document.getElementById("guest-lobby-msg").classList.remove("hidden");
+  }
+}
+
+function showGame(room) {
+  document.getElementById("screen-lobby").classList.add("hidden");
+  document.getElementById("screen-game").classList.remove("hidden");
+  document.getElementById("game-room-label").textContent = window.myRoom;
+
+  if (window.isHost) {
+    document.getElementById("host-call-controls").classList.remove("hidden");
+    document.getElementById("guest-call-info").classList.add("hidden");
+  } else {
+    document.getElementById("host-call-controls").classList.add("hidden");
+    document.getElementById("guest-call-info").classList.remove("hidden");
+  }
+}
+
+// ─── Render ──────────────────────────────────
+function renderRoom(room) {
+  if (!room) return;
+
+  // Lobby players
+  const playersObj = room.players || {};
+  const names = Object.keys(playersObj);
+  document.getElementById("lobby-player-count").textContent = names.length;
+  document.getElementById("lobby-players").innerHTML = names.map(n =>
+    `<span class="player-chip ${n === room.host ? "host" : ""} ${n === window.myName ? "me" : ""}">${n === room.host ? "★ " : ""}${n}</span>`
+  ).join("");
+
+  if (room.status === "playing") {
+    if (document.getElementById("screen-game").classList.contains("hidden")) showGame(room);
+    renderGame(room);
+  }
+}
+
+function renderGame(room) {
+  const called = new Set(room.called || []);
+  const nums = room.called || [];
+
+  // Big number
+  const latest = nums.length > 0 ? nums[nums.length - 1] : null;
+  document.getElementById("big-number").textContent = latest || "—";
+  document.getElementById("caller-label").textContent = latest ? "Last called number" : "Game started — waiting for first number";
+  document.getElementById("called-count").textContent = nums.length;
+
+  // Balls
+  const ballsEl = document.getElementById("balls-wrap");
+  const reversed = [...nums].reverse();
+  ballsEl.innerHTML = reversed.map((n, i) =>
+    `<div class="ball ${i === 0 ? "latest" : "called"}">${n}</div>`
+  ).join("");
+
+  // Ticket
+  const grid = document.getElementById("ticket-grid");
+  const myNums = flatNums(window.myTicket);
+  const matched = myNums.filter(n => called.has(n));
+  document.getElementById("ticket-progress").textContent = `${matched.length}/${myNums.length}`;
+
+  grid.innerHTML = window.myTicket.flat().map(n => {
+    if (n === 0) return `<div class="tcell blank"></div>`;
+    return `<div class="tcell ${called.has(n) ? "hit" : ""}">${n}</div>`;
+  }).join("");
+
+  // Claim buttons
+  const strip = document.getElementById("claim-strip");
+  strip.innerHTML = PRIZES
+    .filter(p => !room.winners?.[p.key] && checkPrize(p.key, called, window.myTicket))
+    .map(p => `<button class="btn btn-primary btn-sm" onclick="claimPrize('${p.key}')">Claim: ${p.label}!</button>`)
+    .join("");
+
+  // Prizes grid
+  document.getElementById("prizes-grid").innerHTML = PRIZES.map(p => `
+    <div class="prize-item">
+      <div class="prize-name">${p.label}</div>
+      <div class="prize-winner ${room.winners?.[p.key] ? "" : "empty"}">${room.winners?.[p.key] || "—"}</div>
+    </div>
+  `).join("");
+
+  // Game players
+  const pObj = room.players || {};
+  document.getElementById("game-players").innerHTML = Object.keys(pObj).map(n =>
+    `<span class="player-chip ${n === room.host ? "host" : ""} ${n === window.myName ? "me" : ""}">${n === room.host ? "★ " : ""}${n}</span>`
+  ).join("");
+}
+
+// ─── Listen ──────────────────────────────────
+function startListening() {
+  if (window.gameListener) window.gameListener();
+  window.gameListener = dbListen(`rooms/${window.myRoom}`, renderRoom);
+}
+
+// ─── Tab switching ───────────────────────────
+window.switchTab = function(tab) {
+  ["ticket","caller","prizes"].forEach(t => {
+    document.getElementById("tab-"+t).classList.toggle("hidden", t !== tab);
+    document.getElementById("tab-btn-"+t).classList.toggle("active", t === tab);
+  });
+};
+
+// ─── Auto-fill room from URL ──────────────────
+const urlRoom = new URLSearchParams(location.search).get("room");
+if (urlRoom) {
+  document.getElementById("join-code").value = urlRoom.toUpperCase();
+}
+</script>
+</body>
+</html>
